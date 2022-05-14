@@ -1,7 +1,11 @@
 <script lang="ts" setup>
 import ReactiveCounter from '/@/components/ReactiveCounter.vue';
 import ReactiveHash from '/@/components/ReactiveHash.vue';
-import ElectronVersions from '/@/components/ElectronVersions.vue';</script>
+import ElectronVersions from '/@/components/ElectronVersions.vue';
+import {Button} from 'vant';
+import {computed} from 'vue';
+const ver = computed(()=>'dd');
+</script>
 
 <template>
   <img
@@ -9,7 +13,9 @@ import ElectronVersions from '/@/components/ElectronVersions.vue';</script>
     src="../assets/logo.svg"
     width="150"
   >
-
+  <Button type="success">
+    ddd
+  </Button>
   <p>
     For a guide and recipes on how to configure / customize this project,<br>
     check out the
@@ -37,6 +43,7 @@ import ElectronVersions from '/@/components/ElectronVersions.vue';</script>
   <p>
     Edit
     <code>packages/renderer/src/App.vue</code> to test hot module replacement.
+    <button>{{ ver }}</button>
   </p>
 </template>
 
