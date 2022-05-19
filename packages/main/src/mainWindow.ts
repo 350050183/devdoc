@@ -1,14 +1,20 @@
 import {BrowserWindow} from 'electron';
 import {join} from 'path';
 import {URL} from 'url';
+const os = require('os');
 
 async function createWindow() {
   const browserWindow = new BrowserWindow({
     show: false, // Use 'ready-to-show' event to show window
+    useContentSize: true,
+    fullscreen: false,
+    frame: true,
     webPreferences: {
       // nativeWindowOpen: true,
       webviewTag: false, // The webview tag is not recommended. Consider alternatives like iframe or Electron's BrowserView. https://www.electronjs.org/docs/latest/api/webview-tag#warning
       preload: join(__dirname, '../../preload/dist/index.cjs'),
+      webSecurity: false,
+      allowRunningInsecureContent: true,
     },
   });
 
@@ -38,6 +44,15 @@ async function createWindow() {
 
   await browserWindow.loadURL(pageUrl);
 
+
+  // const view = new BrowserView();
+  // browserWindow.setBrowserView(view);
+  // const viewWidth = 1000;
+  // const viewHeight = 800;
+  // view.setBounds({x: 220, y: 70, width: viewWidth, height: viewHeight});
+  // view.setAutoResize({horizontal:true,vertical:true, width: true, height: true});
+  // view.webContents.loadURL('https://youzan.github.io/vant/#/zh-CN');
+
   return browserWindow;
 }
 
@@ -55,5 +70,10 @@ export async function restoreOrCreateWindow() {
     window.restore();
   }
 
+
+  window.setRepresentedFilename(os.homedir());
+  window.setDocumentEdited(false);
+
+  window.maximize();
   window.focus();
 }

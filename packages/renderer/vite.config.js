@@ -5,9 +5,12 @@ import {join} from 'path';
 import {builtinModules} from 'module';
 import vue from '@vitejs/plugin-vue';
 import { createStyleImportPlugin,VantResolve } from 'vite-plugin-style-import';
+import { VantResolver } from 'unplugin-vue-components/resolvers';
+
 import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
 import checker from 'vite-plugin-checker';
+// import Inspect from 'vite-plugin-inspect';
 
 
 const PACKAGE_ROOT = __dirname;
@@ -64,34 +67,40 @@ const config = {
         {
           '@vueuse/core': [
             // named imports
-            'useMouse', // import { useMouse } from '@vueuse/core',
+            // 'useMouse', // import { useMouse } from '@vueuse/core',
             // alias
-            ['useFetch', 'useMyFetch'], // import { useFetch as useMyFetch } from '@vueuse/core',
+            // ['useFetch', 'useMyFetch'], // import { useFetch as useMyFetch } from '@vueuse/core',
           ],
           'axios': [
             // default imports
-            ['default', 'axios'], // import { default as axios } from 'axios',
+            // ['default', 'axios'], // import { default as axios } from 'axios',
           ],
-          '[package-name]': [
-            '[import-names]',
+          // '[package-name]': [
+            // '[import-names]',
             // alias
-            ['[from]', '[alias]'],
-          ],
+            // ['[from]', '[alias]'],
+          // ],
         },
       ],
 
       // Generate corresponding .eslintrc-auto-import.json file.
       // eslint globals Docs - https://eslint.org/docs/user-guide/configuring/language-options#specifying-globals
       eslintrc: {
-        enabled: false, // Default `false`
+        enabled: true, // Default `false`
         filepath: './.eslintrc-auto-import.json', // Default `./.eslintrc-auto-import.json`
         globalsPropValue: true, // Default `true`, (true | false | 'readonly' | 'readable' | 'writable' | 'writeable')
+        rules: {
+          semi: [
+            'error',
+            'always',
+          ],
+        },
       },
 
       // custom resolvers
       // see https://github.com/antfu/unplugin-auto-import/pull/23/
       resolvers: [
-        /* ... */
+        VantResolver(),
       ],
 
       // Filepath to generate corresponding .d.ts file.
