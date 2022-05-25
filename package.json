@@ -54,8 +54,10 @@
     "@typescript-eslint/parser": "^5.23.0",
     "@volar/vue-language-service": "^0.34.13",
     "electron-updater": "4.6.5",
+    "glob": "^8.0.3",
     "vant": "^3.4.9",
     "vite-plugin-style-import": "^2.0.0",
-    "vue": "3.2.31"
+    "vue": "3.2.31",
+    "vuex-electron": "^1.0.3"
   }
 }

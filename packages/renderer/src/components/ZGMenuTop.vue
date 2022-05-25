@@ -7,6 +7,7 @@
       >
         <a
           href="#"
+          :item-id="item.id"
           @click="activeMenu"
         >{{ item.name }}</a>
       </li>
@@ -15,17 +16,21 @@
 </template>
 
 <script lang="ts" setup>
-import axios from 'axios';
-const api = 'http://devdocs.secret8.net/api/docs/index?parent_id=0';
-interface DocItem  {
-  id:number,
-  name:string
+import {useStore} from 'vuex';
+import docCate from '/@/api/docCate';
+
+interface DocItem {
+  id: number,
+  name: string
 }
-const list:Array<DocItem> = [];
+
+const list: Array<DocItem> = [];
 const topMenuItems = ref(list);
 
 //Way 1:
-(async ()=>{topMenuItems.value=await axios.get(api).then((res)=>res.data.data.items);})();
+(async () => {
+  topMenuItems.value = await docCate.index();
+})();
 
 //Way 2:
 // onMounted(async () => {
@@ -33,12 +38,15 @@ const topMenuItems = ref(list);
 //   topMenuItems.value = res.data.data.items;
 // });
 
-console.log(topMenuItems);
+const store = useStore();
+function activeMenu(e: any) {
+  const parent_id = (e.target as HTMLElement).getAttribute('item-id');
+  store.commit('setValue', parent_id);
+  store.dispatch('getLeftMenu');
+  console.log('click menu:', parent_id);
 
-function  activeMenu(e: any) {
-  // console.log(e.target);
   const nodes = document.getElementsByTagName('a');
-  let idx: any;
+  let idx: object;
   for (idx of nodes) {
     // console.log(idx);
     if ((idx as HTMLElement).className === 'zg-menu-top-active') {
