@@ -1,9 +1,9 @@
 import {app, BrowserWindow, ipcMain, screen} from 'electron';
-import './security-restrictions';
+// import './security-restrictions';
 import {restoreOrCreateWindow} from '/@/mainWindow';
 import IpcMainEvent = Electron.IpcMainEvent;
 
-ipcMain.on('open-url-event', function (event: IpcMainEvent, ...args: any[]) {
+ipcMain.on('open-url-event', function (event: IpcMainEvent, ...args: string[]) {
   // console.log(event,args);
   openView(args[0]).then();
 });
@@ -18,7 +18,7 @@ async function openView(url: string) {
     height: height,
     webPreferences: {
       javascript: true,
-      webSecurity: false,
+      webSecurity: true,
       allowRunningInsecureContent: true,
     },
   });

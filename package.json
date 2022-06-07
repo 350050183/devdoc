@@ -55,6 +55,7 @@
     "@volar/vue-language-service": "^0.34.13",
     "electron-updater": "4.6.5",
     "glob": "^8.0.3",
+    "pinia": "^2.0.14",
     "vant": "^3.4.9",
     "vite-plugin-style-import": "^2.0.0",
     "vue": "3.2.31",

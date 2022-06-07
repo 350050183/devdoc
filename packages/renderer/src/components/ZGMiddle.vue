@@ -25,7 +25,7 @@
                 :key="item.id"
                 :icon="item.icon"
                 :text="item.text"
-                :dot="item.is_new==1"
+                :dot="item.is_new===1"
                 @click="openUrl(item.url)"
               />
             </Grid>
@@ -38,7 +38,7 @@
 
 <script lang="ts" setup>
 import {IndexBar, Cell, IndexAnchor, Grid, GridItem, TreeSelect, Col, Row} from 'vant';
-import {useStore} from 'vuex';
+import {useStore} from '../store/store';
 
 // (async () => {
 // const result: { success: boolean, msg: string, items: any[] } = await axios.get(api).then((res) => res.data);

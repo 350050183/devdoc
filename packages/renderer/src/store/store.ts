@@ -3,15 +3,8 @@ import type {Store,Commit} from 'vuex';
 import {createStore, useStore as baseUseStore} from 'vuex';
 import docCate from '/@/api/docCate';
 import docUrl from '/@/api/docUrl';
-
-export interface State {
-  count: number,
-  parent_id: number,
-  url: string,
-  leftMenu:TLeftMenu[],
-  left_menu_id:number,
-  middleMenu:TMiddleMenu[],
-}
+//will import from index.d.ts
+// import type {State, TMiddleResultType, TResultType} from '../store/store';
 
 const state:State = {
   count: 0,
@@ -23,9 +16,9 @@ const state:State = {
 };
 
 const mutations = {
-  setValue(state: State, payload: number) {
+  setValue(state: State, payload: string) {
     console.log('mutations:setValue',payload);
-    state.parent_id = payload;
+    state.parent_id = parseInt(payload);
   },
   setLeftMenu(state: State, payload: []) {
     console.log('mutations:setLeftMenu',payload);
@@ -40,42 +33,6 @@ const mutations = {
     state.middleMenu = payload;
   },
 };
-
-
-interface TLeftMenu {
-  text: string,
-  children: {'text':string,'id':number}[],
-}
-interface TResultType {
-  success: boolean,
-  msg: string,
-  data: {
-    items: TLeftMenu[],
-    pagination: {
-      page: number, page_size: number, total: number
-    }
-  }
-}
-
-
-interface TMiddleMenu {
-    string:[{
-      icon: string,
-      text: string,
-      url:string,
-      is_new:number,
-    }]
-}
-interface TMiddleResultType {
-  success: boolean,
-  msg: string,
-  data: {
-    items: TMiddleMenu[],
-    pagination: {
-      page: number, page_size: number, total: number
-    }
-  }
-}
 
 const actions = {
   async getLeftMenu({ commit }:{commit:Commit}) {

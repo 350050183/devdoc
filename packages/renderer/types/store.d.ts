@@ -1,23 +1,27 @@
-export declare module '/@/store/store' {
+declare module '../store/store' {
   interface Counter {
     main?: number;
   }
+
   interface docs {
     url?: string;
     menuIdx?: number;
   }
+
   interface State {
     count: number,
     parent_id: number,
     url: string,
-    leftMenu:TLeftMenu[],
-    left_menu_id:number,
-    middleMenu:TMiddleMenu[],
+    leftMenu: TLeftMenu[],
+    left_menu_id: number,
+    middleMenu: TMiddleMenu[],
   }
+
   interface TLeftMenu {
     text: string,
-    children: {'text':string,'id':number}[],
+    children: { 'text': string, 'id': number }[],
   }
+
   interface TResultType {
     success: boolean,
     msg: string,
@@ -28,15 +32,17 @@ export declare module '/@/store/store' {
       }
     }
   }
+
   interface TMiddleMenu {
-    string:{
+    string: {
       icon: string,
       text: string,
-      url:string,
-      is_new:number,
-      id:number,
-    }
+      url: string,
+      is_new: number,
+      id: number,
+    };
   }
+
   interface TMiddleResultType {
     success: boolean,
     msg: string,
@@ -48,4 +54,3 @@ export declare module '/@/store/store' {
     }
   }
 }
-//export default store;

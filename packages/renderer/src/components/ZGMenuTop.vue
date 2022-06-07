@@ -7,7 +7,7 @@
       >
         <a
           href="#"
-          :item-id="item.id"
+          :rel="item.id.toString()"
           @click="activeMenu"
         >{{ item.name }}</a>
       </li>
@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts" setup>
-import {useStore} from 'vuex';
+import {useStore} from '../store/store';
 import docCate from '/@/api/docCate';
 
 interface DocItem {
@@ -26,6 +26,7 @@ interface DocItem {
 
 const list: Array<DocItem> = [];
 const topMenuItems = ref(list);
+// watch({list},(newValue)=>{});
 
 //Way 1:
 (async () => {
@@ -39,16 +40,15 @@ const topMenuItems = ref(list);
 // });
 
 const store = useStore();
-function activeMenu(e: any) {
-  const parent_id = (e.target as HTMLElement).getAttribute('item-id');
+function activeMenu(e: Event) {
+  const parent_id = (e.target as HTMLElement).getAttribute('rel');
   store.commit('setValue', parent_id);
   store.dispatch('getLeftMenu');
-  console.log('click menu:', parent_id);
+  // console.log('click menu:', parent_id);
 
   const nodes = document.getElementsByTagName('a');
   let idx: object;
   for (idx of nodes) {
-    // console.log(idx);
     if ((idx as HTMLElement).className === 'zg-menu-top-active') {
       (idx as HTMLElement).className = '';
     }
@@ -77,15 +77,15 @@ function activeMenu(e: any) {
 }
 
 
-.zg-menu-top-active {
-  background-color: #c84d4d;
-  color: white;
-}
+/*.zg-menu-top-active {*/
+/*  background-color: #c84d4d;*/
+/*  color: white;*/
+/*}*/
 
-.zg-menu-top-unactived {
-  background-color: white;
-  color: black;
-}
+/*.zg-menu-top-unactived {*/
+/*  background-color: white;*/
+/*  color: black;*/
+/*}*/
 
 .zg-menu-top ul li a {
   display: block;
