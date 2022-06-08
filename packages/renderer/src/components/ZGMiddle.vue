@@ -38,7 +38,10 @@
 
 <script lang="ts" setup>
 import {IndexBar, Cell, IndexAnchor, Grid, GridItem, TreeSelect, Col, Row} from 'vant';
-import {useStore} from '../store/store';
+import {docsStore} from '/@/store/docs';
+// import {storeToRefs} from 'pinia';
+
+const store = docsStore();
 
 // (async () => {
 // const result: { success: boolean, msg: string, items: any[] } = await axios.get(api).then((res) => res.data);
@@ -48,9 +51,8 @@ import {useStore} from '../store/store';
 const activeId = ref([1]);
 const activeIndex = ref(0);
 
-const store = useStore();
-const leftMenu = computed(() => store.state.leftMenu);
-const middleMenu = computed(() => store.state.middleMenu);
+const leftMenu = computed(() => store.leftMenu);
+const middleMenu = computed(() => store.middleMenu);
 
 function openUrl(url: string) {
   window.bridge.openUrl(url);
@@ -58,12 +60,13 @@ function openUrl(url: string) {
 
 function clickLeftMenuItem(e: { text: string, id: number }) {
   console.log(e.id);
-  store.commit('setLeftMenuValue', e.id);
-  store.dispatch('getMiddleList', e.id);
+  store.setLeftMenuValue(e.id);
+  store.getMiddleList(e.id);
 }
 
-onMounted(()=>{
-  store.commit('setLeftMenuValue',1);
+
+onMounted(() => {
+  store.setLeftMenuValue(1);
 });
 
 </script>

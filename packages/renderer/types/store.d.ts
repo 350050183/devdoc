@@ -1,4 +1,4 @@
-declare module '../store/store' {
+declare module 'store' {
   interface Counter {
     main?: number;
   }

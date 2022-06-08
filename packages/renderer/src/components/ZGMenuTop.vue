@@ -16,8 +16,8 @@
 </template>
 
 <script lang="ts" setup>
-import {useStore} from '../store/store';
 import docCate from '/@/api/docCate';
+import {docsStore} from '/@/store/docs';
 
 interface DocItem {
   id: number,
@@ -39,11 +39,11 @@ const topMenuItems = ref(list);
 //   topMenuItems.value = res.data.data.items;
 // });
 
-const store = useStore();
+const store = docsStore();
 function activeMenu(e: Event) {
   const parent_id = (e.target as HTMLElement).getAttribute('rel');
-  store.commit('setValue', parent_id);
-  store.dispatch('getLeftMenu');
+  store.setValue(parent_id??'');
+  store.getLeftMenu();
   // console.log('click menu:', parent_id);
 
   const nodes = document.getElementsByTagName('a');

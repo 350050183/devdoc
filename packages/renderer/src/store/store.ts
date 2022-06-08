@@ -3,8 +3,7 @@ import type {Store,Commit} from 'vuex';
 import {createStore, useStore as baseUseStore} from 'vuex';
 import docCate from '/@/api/docCate';
 import docUrl from '/@/api/docUrl';
-//will import from index.d.ts
-// import type {State, TMiddleResultType, TResultType} from '../store/store';
+import type {State, TMiddleResultType, TResultType} from 'store';
 
 const state:State = {
   count: 0,
