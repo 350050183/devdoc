@@ -6,9 +6,39 @@ import {Row, Col} from 'vant';
 // import ZGSideBar from '/@/components/ZGSideBar.vue';
 import ZGMenuTop from '/@/components/ZGMenuTop.vue';
 import ZGMiddle from '/@/components/ZGMiddle.vue';
+import ZGLogin from '/@/components/ZGLogin.vue';
+import ZGRegister from '/@/components/ZGRegister.vue';
+import ZGUrl from '/@/components/ZGUrl.vue';
+import {userStore} from '/@/store/user';
 
 const siteTitle = computed(() => import.meta.env.VITE_SITE_TITLE);
 const siteCompanyName = computed(() => import.meta.env.VITE_SITE_COMPANY_NAME);
+
+let currentTabComponent = shallowRef({});
+
+currentTabComponent.value = ZGMiddle;
+
+const store = userStore();
+const token = computed(() => store.token);
+
+function onZgNavClick(menu_title=''){
+  console.log('ZgNavClick',menu_title);
+  if(menu_title==='ZGLogin') {
+    currentTabComponent.value = ZGLogin;
+  }else if(menu_title==='ZGRegister') {
+    currentTabComponent.value = ZGRegister;
+  }else if(menu_title==='ZGUrl') {
+    // console.log(token.value);
+    if(token.value.length>=32) {
+      currentTabComponent.value = ZGUrl;
+      // ZGUrl.isNeedRefresh = true;
+    }else{
+      currentTabComponent.value = ZGLogin;
+    }
+  }else{
+    currentTabComponent.value = ZGMiddle;
+  }
+}
 </script>
 
 <template>
@@ -18,22 +48,33 @@ const siteCompanyName = computed(() => import.meta.env.VITE_SITE_COMPANY_NAME);
         span="4"
         class="zg-logo"
       >
-        <div>{{ siteTitle }}</div>
+        <div>
+          <img
+            src="/assets/logo.png"
+            class="zg-logo-img"
+          > {{ siteTitle }}
+        </div>
       </Col>
       <Col
         span="20"
         class="zg-nav-top"
       >
         <div>
-          <ZGMenuTop />
+          <ZGMenuTop @ZgNavClick="onZgNavClick" />
         </div>
       </Col>
     </Row>
     <Row class="zg-middle">
       <Col span="24">
-        <ZGMiddle />
+        <keep-alive>
+          <component
+            :is="currentTabComponent"
+            @ZgNavClick="onZgNavClick"
+          />
+        </keep-alive>
       </Col>
     </Row>
+    <div style="height:100px;" />
     <Row class="zg-footer">
       <Col span="24">
         {{ siteCompanyName }}
@@ -76,12 +117,20 @@ body,a {
   display: flex;
   justify-items: center;
   align-items: center;
-  /*background-color: #e6e3b3;*/
+}
+.zg-header .zg-logo .zg-logo-img {
+  width:60px;
+  height: 50px;
+  float:left;
+  padding-left:10px;
+  padding-right:10px;
 }
 
 .zg-header .zg-logo div {
-  width: 100%;
   text-align: center;
+  justify-items: center;
+  align-items: center;
+  display: flex;
 }
 
 .zg-header .zg-nav-top {
@@ -104,7 +153,7 @@ body,a {
 .zg-footer {
   display: flex;
   align-items: center;
-  /*position: fixed;*/
+  position: fixed;
   bottom: 0;
   width: 100%;
   height: 45px;

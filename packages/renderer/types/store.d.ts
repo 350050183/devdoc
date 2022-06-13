@@ -17,6 +17,33 @@ declare module 'store' {
     middleMenu: TMiddleMenu[],
   }
 
+  interface User {
+    id: number,
+    email:string,
+    avatar:string,
+    mobile:string,
+    token: string,
+    nickname: string,
+  }
+
+  interface TZGUrl {
+    id:string,
+    cate_id: string;
+    title: string;
+    url: string;
+    icon_class: string;
+    alpha: string;
+    is_new: string;
+    logo: string;
+    description: string;
+  }
+
+  interface TZGCate {
+    id:string,
+    name: string;
+    parent_id: string;
+  }
+
   interface TLeftMenu {
     text: string,
     children: { 'text': string, 'id': number }[],
@@ -40,6 +67,7 @@ declare module 'store' {
       url: string,
       is_new: number,
       id: number,
+      logo: string,
     };
   }
 

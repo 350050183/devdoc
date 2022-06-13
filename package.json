@@ -1,5 +1,5 @@
 {
-  "name": "vite-electron-builder",
+  "name": "devdocs",
   "private": true,
   "engines": {
     "node": ">=v16.13",
@@ -42,6 +42,7 @@
     "simple-git-hooks": "2.7.0",
     "typescript": "4.5.5",
     "unplugin-auto-import": "^0.7.1",
+    "unplugin-element-plus": "^0.4.0",
     "unplugin-vue-components": "^0.19.5",
     "vite": "2.8.4",
     "vite-plugin-checker": "^0.4.6",
@@ -51,11 +52,14 @@
     "vuex": "^4.0.2"
   },
   "dependencies": {
+    "@element-plus/icons-vue": "^2.0.4",
     "@typescript-eslint/parser": "^5.23.0",
     "@volar/vue-language-service": "^0.34.13",
     "electron-updater": "4.6.5",
+    "element-plus": "^2.2.5",
     "glob": "^8.0.3",
     "pinia": "^2.0.14",
+    "pinia-plugin-persistedstate": "^1.6.1",
     "vant": "^3.4.9",
     "vite-plugin-style-import": "^2.0.0",
     "vue": "3.2.31",

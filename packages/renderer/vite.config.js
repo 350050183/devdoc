@@ -4,13 +4,15 @@ import {chrome} from '../../.electron-vendors.cache.json';
 import {join} from 'path';
 import {builtinModules} from 'module';
 import vue from '@vitejs/plugin-vue';
-import { createStyleImportPlugin,VantResolve } from 'vite-plugin-style-import';
-import { VantResolver } from 'unplugin-vue-components/resolvers';
+import { createStyleImportPlugin,VantResolve,ElementPlusResolve } from 'vite-plugin-style-import';
+import { VantResolver,ElementPlusResolver } from 'unplugin-vue-components/resolvers';
 
 import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
 import checker from 'vite-plugin-checker';
 // import Inspect from 'vite-plugin-inspect';
+//支持按需导入样式组件
+import ElementPlus from 'unplugin-element-plus/vite';
 
 
 const PACKAGE_ROOT = __dirname;
@@ -30,17 +32,29 @@ const config = {
     },
   },
   plugins: [
+    ElementPlus({}),
     vue(),
     checker({ typescript: true }),
     Components({
       dts: true, // enabled by default if `typescript` is installed
-      resolvers: [],
+      resolvers: [
+        VantResolver(),
+        ElementPlusResolver(),
+      ],
     }),
     createStyleImportPlugin({
       resolves:[
         VantResolve(),
+        ElementPlusResolve(),
       ],
       libs: [
+        {
+          libraryName: 'element-plus',
+          esModule: true,
+          resolveStyle: (name) => {
+            return `element-plus/es/${name}/style/index`;
+          },
+        },
         {
           libraryName: 'vant',
           esModule: true,
@@ -101,6 +115,7 @@ const config = {
       // see https://github.com/antfu/unplugin-auto-import/pull/23/
       resolvers: [
         VantResolver(),
+        ElementPlusResolver(),
       ],
 
       // Filepath to generate corresponding .d.ts file.
@@ -116,7 +131,7 @@ const config = {
     },
   },
   build: {
-    sourcemap: true,
+    sourcemap: false,
     target: `chrome${chrome}`,
     outDir: 'dist',
     assetsDir: '.',

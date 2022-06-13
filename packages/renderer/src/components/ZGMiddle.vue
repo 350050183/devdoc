@@ -19,7 +19,10 @@
         >
           <IndexAnchor :index="alpha" />
           <Cell>
-            <Grid clickable>
+            <Grid
+              clickable
+              icon-size="100px"
+            >
               <GridItem
                 v-for="item in indexItem"
                 :key="item.id"
@@ -27,7 +30,13 @@
                 :text="item.text"
                 :dot="item.is_new===1"
                 @click="openUrl(item.url)"
-              />
+              >
+                <template #text>
+                  <div class="zg-grid-item-text">
+                    {{ item.text }}
+                  </div>
+                </template>
+              </GridItem>
             </Grid>
           </Cell>
         </IndexBar>
@@ -59,7 +68,6 @@ function openUrl(url: string) {
 }
 
 function clickLeftMenuItem(e: { text: string, id: number }) {
-  console.log(e.id);
   store.setLeftMenuValue(e.id);
   store.getMiddleList(e.id);
 }
@@ -72,5 +80,8 @@ onMounted(() => {
 </script>
 
 <style scoped>
-
+.zg-grid-item-text{
+  font-size:20px;
+  color: #4b4545;
+}
 </style>
