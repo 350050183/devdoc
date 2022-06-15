@@ -45,6 +45,9 @@
                   <el-dropdown-item @click="onUrl">
                     提供收录
                   </el-dropdown-item>
+                  <el-dropdown-item @click="onFavoriteUrl">
+                    我的收藏
+                  </el-dropdown-item>
 
                   <el-dropdown-item
                     v-if="token==''"
@@ -135,6 +138,9 @@ function onLoginOut() {
 
 function onUrl() {
   emit('ZgNavClick', 'ZGUrl');
+}
+function onFavoriteUrl() {
+  emit('ZgNavClick', 'ZGFavoriteUrl');
 }
 </script>
 

@@ -29,11 +29,38 @@
                 :icon="item.icon"
                 :text="item.text"
                 :dot="item.is_new===1"
-                @click="openUrl(item.url)"
               >
+                <template #icon>
+                  <div
+                    @click="openUrl(item.url)"
+                  >
+                    <van-icon
+                      v-if="item.icon.indexOf('icon')!==false"
+                      :name="item.icon"
+                      size="110px"
+                    />
+                    <van-image
+                      v-else
+                      :src="item.icon"
+                      style="width:110px;"
+                    />
+                  </div>
+                </template>
                 <template #text>
                   <div class="zg-grid-item-text">
-                    {{ item.text }}
+                    <div class="zg-grid-item-title">
+                      {{ item.text }} <el-button
+                        v-if="item.is_fav===false"
+                        plain
+                        size="small"
+                        @click="onAddFavorite(item.id)"
+                      >
+                        收藏
+                      </el-button>
+                    </div>
+                    <div class="zg-grid-item-description">
+                      {{ item.description }}
+                    </div>
                   </div>
                 </template>
               </GridItem>
@@ -48,9 +75,12 @@
 <script lang="ts" setup>
 import {IndexBar, Cell, IndexAnchor, Grid, GridItem, TreeSelect, Col, Row} from 'vant';
 import {docsStore} from '/@/store/docs';
+import docFavoriteUrl from '/@/api/docFavoriteUrl';
+import {userStore} from '/@/store/user';
 // import {storeToRefs} from 'pinia';
 
 const store = docsStore();
+const user = userStore();
 
 // (async () => {
 // const result: { success: boolean, msg: string, items: any[] } = await axios.get(api).then((res) => res.data);
@@ -69,7 +99,7 @@ function openUrl(url: string) {
 
 function clickLeftMenuItem(e: { text: string, id: number }) {
   store.setLeftMenuValue(e.id);
-  store.getMiddleList(e.id);
+  store.getMiddleList(e.id,user.token);
 }
 
 
@@ -77,11 +107,37 @@ onMounted(() => {
   store.setLeftMenuValue(1);
 });
 
+const token = computed(() => user.token);
+
+async function onAddFavorite(id:number){
+  store.isNeedRefreshFavUrl = false;
+  const result = await docFavoriteUrl.add(id, token.value);
+  if (result.success) {
+    ElMessage({
+      message: '收藏成功。',
+      type: 'success',
+    });
+    store.isNeedRefreshFavUrl = true;
+  } else {
+    ElMessage({
+      message: '收藏失败：' + result.message,
+      type: 'error',
+    });
+  }
+}
+
 </script>
 
 <style scoped>
 .zg-grid-item-text{
   font-size:20px;
   color: #4b4545;
+}
+.zg-grid-item-title{
+  text-align: center;
+}
+.zg-grid-item-description{
+  font-size:15px;
+  color: #a0a0a0;
 }
 </style>

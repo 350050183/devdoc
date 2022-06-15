@@ -12,6 +12,7 @@ const state:State = {
   leftMenu:[],
   left_menu_id:0,
   middleMenu:[],
+  isNeedRefreshFavUrl: false,
 };
 
 const mutations = {
@@ -36,7 +37,7 @@ const actions = {
     commit('setMiddleList',[]);
   },
   async getMiddleList({ commit }:{commit:Commit}) {
-    const result: TMiddleResultType = await docUrl.tree(state.left_menu_id);
+    const result: TMiddleResultType = await docUrl.tree(state.left_menu_id,'');
     commit('setMiddleList', result.data.items);
   },
 };

@@ -7,8 +7,8 @@ const api_docurl_upload = import.meta.env.VITE_API_SERVER_URL + '/docFile/upload
 const api_docurl_edit = import.meta.env.VITE_API_SERVER_URL + '/docUrl/edit';
 const api_docurl_del = import.meta.env.VITE_API_SERVER_URL + '/docUrl/del';
 
-function tree(left_menu_id = 0, page = 1, size = 200) {
-  const config = {params: {parent_id: left_menu_id, page: page, size: size}};
+function tree(left_menu_id = 0,token: string, page = 1, size = 200) {
+  const config = {params: {token: token, parent_id: left_menu_id, page: page, size: size}};
   return axios.get(api_middle_list, config).then((res) => res.data);
 }
 

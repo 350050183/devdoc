@@ -15,6 +15,7 @@ export const docsStore = defineStore('docs', {
       leftMenu:[],
       left_menu_id:0,
       middleMenu:[],
+      isNeedRefreshFavUrl:false,
     } as State;
   },
   actions:{
@@ -35,8 +36,8 @@ export const docsStore = defineStore('docs', {
       this.leftMenu = result.data.items;
       this.middleMenu = [];
     },
-    async getMiddleList(id:number) {
-      const result: TMiddleResultType = await docUrl.tree(id);
+    async getMiddleList(id:number,token:string) {
+      const result: TMiddleResultType = await docUrl.tree(id,token);
       this.middleMenu = result.data.items;
     },
   },

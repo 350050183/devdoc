@@ -14,7 +14,7 @@
       <el-table-column
         label="分类"
         prop="cate_id"
-        width="120"
+        width="160"
       >
         <template #default="scope">
           {{ cate_name(scope.row.cate_id) }}
@@ -258,6 +258,7 @@ const filterTableData = computed(() =>
 
 function onAdd() {
   dialogFormVisible.value = true;
+  ruleForm.id = '';
 }
 
 const validateTitle = (rule: any, value: string, callback: any) => {

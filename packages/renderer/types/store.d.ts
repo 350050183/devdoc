@@ -15,6 +15,7 @@ declare module 'store' {
     leftMenu: TLeftMenu[],
     left_menu_id: number,
     middleMenu: TMiddleMenu[],
+    isNeedRefreshFavUrl: boolean,
   }
 
   interface User {
@@ -68,6 +69,8 @@ declare module 'store' {
       is_new: number,
       id: number,
       logo: string,
+      description: string,
+      is_fav: boolean,
     };
   }
 
