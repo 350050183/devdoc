@@ -464,6 +464,7 @@ const beforeRemove: UploadProps['beforeRemove'] = (uploadFile, uploadFiles) => {
 const handleSuccess: UploadProps['onSuccess'] = (result: any, ufile: UploadFile, ufiles: UploadFiles) => {
   if (result.success) {
     ruleForm.logo = import.meta.env.VITE_API_SERVER_URL + result.data.logo;
+    fileList.value = [];
   } else {
     ElMessage({
       message: '文件上传失败：' + result.message,

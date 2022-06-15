@@ -20,7 +20,6 @@
           <IndexAnchor :index="alpha" />
           <Cell>
             <Grid
-              clickable
               icon-size="100px"
             >
               <GridItem
@@ -32,6 +31,7 @@
               >
                 <template #icon>
                   <div
+                    class="zg-grid-item-icon"
                     @click="openUrl(item.url)"
                   >
                     <van-icon
@@ -53,7 +53,7 @@
                         v-if="item.is_fav===false"
                         plain
                         size="small"
-                        @click="onAddFavorite(item.id)"
+                        @click="onAddFavorite($event,item.id)"
                       >
                         收藏
                       </el-button>
@@ -109,7 +109,7 @@ onMounted(() => {
 
 const token = computed(() => user.token);
 
-async function onAddFavorite(id:number){
+async function onAddFavorite(e:Event,id:number){
   store.isNeedRefreshFavUrl = false;
   const result = await docFavoriteUrl.add(id, token.value);
   if (result.success) {
@@ -118,6 +118,7 @@ async function onAddFavorite(id:number){
       type: 'success',
     });
     store.isNeedRefreshFavUrl = true;
+    (e.target as HTMLElement).parentElement.style.display = 'none';
   } else {
     ElMessage({
       message: '收藏失败：' + result.message,
@@ -132,6 +133,9 @@ async function onAddFavorite(id:number){
 .zg-grid-item-text{
   font-size:20px;
   color: #4b4545;
+}
+.zg-grid-item-icon{
+  cursor:pointer;
 }
 .zg-grid-item-title{
   text-align: center;
