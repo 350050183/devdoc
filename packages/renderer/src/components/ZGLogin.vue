@@ -70,7 +70,9 @@
 import type { FormInstance } from 'element-plus';
 import docUser from '/@/api/docUser';
 import {userStore} from '/@/store/user';
+import {docsStore} from '/@/store/docs';
 const store = userStore();
+const docs_store = docsStore();
 
 const emit = defineEmits(['ZgNavClick']);
 
@@ -90,14 +92,10 @@ const checkEmail = (rule: any, value: string, callback: any) => {
     return callback(new Error('邮箱不能为空'));
   }
   setTimeout(() => {
-    if (value.indexOf('@')<=0 || value.indexOf('.')<=0) {
+    if (!value.match(/[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/)) {
       callback(new Error('请输入正确的邮箱'));
     } else {
-      if (value.length < 10) {
-        callback(new Error('请输入正确的邮箱'));
-      } else {
-        callback();
-      }
+      callback();
     }
   }, 1000);
 };
@@ -123,6 +121,7 @@ const submitForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   formEl.validate(async (valid) => {
     if (valid) {
+      docs_store.isNeedRefreshCate = false;
       const result = await docUser.login({'email':ruleForm.email,'password':ruleForm.password});
       if(result.success){
         ElMessage({
@@ -131,6 +130,7 @@ const submitForm = (formEl: FormInstance | undefined) => {
         });
         //save user info
         await store.setValue(result.data.user_info);
+        docs_store.isNeedRefreshCate = true;
 
         emit('ZgNavClick', 'ZGUrl');
       }else{

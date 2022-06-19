@@ -1,0 +1,253 @@
+<template>
+  <div class="custom-tree-container">
+    <div class="custom-tree-container-inner">
+      <p class="zg-title">
+        分类管理
+      </p>
+      <el-tree
+        :data="dataSource"
+        node-key="id"
+        default-expand-all
+        :expand-on-click-node="false"
+      >
+        <template #default="{ node, data }">
+          <div class="custom-tree-node">
+            <span class="custom-tree-node-label">{{ node.label }}</span>
+            <span>
+              <a
+                v-if="data.level<3"
+                @click="append(node, data)"
+              > <el-icon><CirclePlusFilled /></el-icon> 增加 </a>
+              <a
+                v-if="data.is_mine===1"
+                @click="edit(node, data)"
+              > <el-icon><Tickets /></el-icon> 编辑 </a>
+              <a
+                v-if="data.children.length<=0 && data.is_mine===1"
+                class="zg-delete"
+                @click="remove(node, data)"
+              > <el-icon><CloseBold /></el-icon> 删除 </a>
+            </span>
+          </div>
+        </template>
+      </el-tree>
+    </div>
+  </div>
+</template>
+
+<script lang="ts" setup>
+import type Node from 'element-plus/es/components/tree/src/model/node';
+import docCate from '/@/api/docCate';
+import {userStore} from '/@/store/user';
+import {docsStore} from '/@/store/docs';
+import type {TResult, TResultOfOp} from 'store';
+
+interface Tree {
+  id: number
+  label: string
+  level: number
+  is_mine: number
+  children?: Tree[]
+}
+
+const store = userStore();
+const token = computed(() => store.token);
+const docs_store = docsStore();
+
+const append = (node:Node,data: Tree) => {
+
+  ElMessageBox.prompt('请输入类别名称', '增加', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    inputPattern:
+      /[\u4e00-\u9fa5_a-zA-Z0-9 ]+/,
+    inputErrorMessage: '不正确的名称',
+  })
+    .then(({ value }) => {
+     doAdd(node,data,value);
+    })
+    .catch(() => {
+      // ElMessage({
+      //   type: 'info',
+      //   message: 'Input canceled',
+      // });
+    });
+};
+
+async function doAdd(node:Node,data:Tree,cate_name:string){
+  if(cate_name){
+    docs_store.isNeedRefreshCateOption = false;
+    const result:TResultOfOp = await docCate.add(cate_name, node.data.id, token.value);
+    if (result.success) {
+      ElMessage({
+        message: '添加成功。',
+        type: 'success',
+      });
+
+      const newChild = { id: (result.data.id), level:(result.data.level),is_mine:1, label: cate_name, children: [] };
+      if (!data.children) {
+        data.children = [];
+      }
+      data.children.push(newChild);
+      dataSource.value = [...dataSource.value];
+      docs_store.isNeedRefreshCateOption = true;
+    } else {
+      ElMessage({
+        message: '添加失败：' + result.message,
+        type: 'error',
+      });
+    }
+  }
+}
+
+const edit = (node:Node,data: Tree) => {
+
+  ElMessageBox.prompt('请输入类别名称', '修改', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    inputValue: data.label,
+    inputPattern:
+      /[\u4e00-\u9fa5_a-zA-Z0-9 ]+/,
+    inputErrorMessage: '不正确的名称',
+  })
+    .then(({ value }) => {
+      doEdit(node,data,value);
+    })
+    .catch(() => {
+      // ElMessage({
+      //   type: 'info',
+      //   message: 'Input canceled',
+      // });
+    });
+};
+
+async function doEdit(node:Node,data:Tree,cate_name:string){
+  if(cate_name){
+    docs_store.isNeedRefreshCateOption = false;
+    const result:TResultOfOp = await docCate.edit( node.data.id, cate_name, token.value);
+    if (result.success) {
+      ElMessage({
+        message: '修改成功。',
+        type: 'success',
+      });
+
+      const newChild = { id: data.id, level:data.level, is_mine:data.is_mine, label: cate_name, children: data.children };
+      if (!data.children) {
+        data.children = [];
+      }
+      const parent = node.parent;
+      const children: Tree[] = parent.data.children || parent.data;
+      const index = children.findIndex((d) => d.id === data.id);
+      //children.splice(index, 1);
+      children[index] = newChild;
+
+      dataSource.value = [...dataSource.value];
+      docs_store.isNeedRefreshCateOption = true;
+    } else {
+      ElMessage({
+        message: '修改失败：' + result.message,
+        type: 'error',
+      });
+    }
+  }
+}
+
+const remove = (node: Node, data: Tree) => {
+  ElMessageBox.confirm(
+    '确定要删除类别',
+    '警告',
+    {
+      confirmButtonText: '删除',
+      cancelButtonText: '取消',
+      type: 'warning',
+    },
+  )
+    .then(() => {
+      doRemove(node,data);
+    })
+    .catch(() => {
+      // ElMessage({
+      //   type: 'info',
+      //   message: 'Delete canceled',
+      // });
+    });
+
+};
+
+async function doRemove(node: Node, data: Tree){
+  const parent = node.parent;
+  const children: Tree[] = parent.data.children || parent.data;
+  const index = children.findIndex((d) => d.id === data.id);
+  docs_store.isNeedRefreshCateOption = false;
+  const result:TResult = await docCate.del(data.id, token.value);
+  if (result.success) {
+    ElMessage({
+      message: '删除成功。',
+      type: 'success',
+    });
+    children.splice(index, 1);
+    dataSource.value = [...dataSource.value];
+
+    docs_store.isNeedRefreshCateOption = true;
+  } else {
+    ElMessage({
+      message: '删除失败：' + result.message,
+      type: 'error',
+    });
+  }
+}
+
+async function refreshCate(){
+  const result = await docCate.tree2(0, token.value);
+  if(result.success){
+    dataSource.value = result.data.items;
+  }
+}
+
+const dataSource = ref<Tree[]>([]);
+onMounted(refreshCate);
+
+watch(() => docs_store.isNeedRefreshCate, (first, second) => {
+  console.log('cate changed: first:'+first+'; second:'+second);
+  if(first){
+    refreshCate();
+  }
+});
+</script>
+
+<style>
+.custom-tree-container{
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  text-align: center;
+}
+
+.custom-tree-container-inner{
+  width:500px;
+  margin:0 auto;
+}
+
+.custom-tree-node {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  padding-right: 8px;
+}
+.custom-tree-node a{
+  float:left;
+  width:100px;
+}
+.custom-tree-node-label{
+  /*width:400px;*/
+}
+.zg-title{
+  font-size:24px;
+}
+.zg-delete{
+  color:red;
+}
+</style>

@@ -2,6 +2,7 @@ import axios from 'axios';
 // const api_middle_list = 'http://devdocs.secret8.net/api/docUrl/tree';
 const api_middle_list = import.meta.env.VITE_API_SERVER_URL + '/docUrl/tree';
 const api_docurl_my = import.meta.env.VITE_API_SERVER_URL + '/docUrl/myurl';
+const api_docurl_index = import.meta.env.VITE_API_SERVER_URL + '/docUrl/index';
 const api_docurl_add = import.meta.env.VITE_API_SERVER_URL + '/docUrl/add';
 const api_docurl_upload = import.meta.env.VITE_API_SERVER_URL + '/docFile/upload';
 const api_docurl_edit = import.meta.env.VITE_API_SERVER_URL + '/docUrl/edit';
@@ -15,6 +16,10 @@ function tree(left_menu_id = 0,token: string, page = 1, size = 200) {
 function myurl(token: string, page = 1, size = 200) {
   const config = {params: {token: token, page: page, size: size}};
   return axios.get(api_docurl_my, config).then((res) => res.data);
+}
+function search(page = 1, size = 200) {
+  const config = {params: {page: page, size: size}};
+  return axios.get(api_docurl_index, config).then((res) => res.data);
 }
 
 function add(params: object, token: string) {
@@ -52,6 +57,7 @@ function del(id:number,token: string) {
 export default {
   tree,
   myurl,
+  search,
   add,
   api_docurl_upload,
   edit,

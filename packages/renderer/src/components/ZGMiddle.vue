@@ -49,17 +49,23 @@
                 <template #text>
                   <div class="zg-grid-item-text">
                     <div class="zg-grid-item-title">
-                      {{ item.text }} <el-button
-                        v-if="item.is_fav===false"
-                        plain
-                        size="small"
-                        @click="onAddFavorite($event,item.id)"
-                      >
-                        收藏
-                      </el-button>
-                    </div>
-                    <div class="zg-grid-item-description">
-                      {{ item.description }}
+                      <span
+                        style="cursor:pointer;"
+                        @click="openUrl(item.url)"
+                      >{{ item.text }}</span>
+                      <div class="zg-grid-item-description">
+                        {{ item.description }}
+                      </div>
+                      <div style="padding-top: 10px;">
+                        <el-button
+                          v-if="item.is_fav===false"
+                          plain
+                          size="small"
+                          @click="onAddFavorite($event,item.id)"
+                        >
+                          收藏
+                        </el-button>
+                      </div>
                     </div>
                   </div>
                 </template>
@@ -83,7 +89,7 @@ const store = docsStore();
 const user = userStore();
 
 // (async () => {
-// const result: { success: boolean, msg: string, items: any[] } = await axios.get(api).then((res) => res.data);
+// const result: { success: boolean, message: string, items: any[] } = await axios.get(api).then((res) => res.data);
 // console.log(result);
 // })();
 

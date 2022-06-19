@@ -16,6 +16,8 @@ declare module 'store' {
     left_menu_id: number,
     middleMenu: TMiddleMenu[],
     isNeedRefreshFavUrl: boolean,
+    isNeedRefreshCate: boolean,
+    isNeedRefreshCateOption: boolean,
   }
 
   interface User {
@@ -52,7 +54,7 @@ declare module 'store' {
 
   interface TResultType {
     success: boolean,
-    msg: string,
+    message: string,
     data: {
       items: TLeftMenu[],
       pagination: {
@@ -76,12 +78,34 @@ declare module 'store' {
 
   interface TMiddleResultType {
     success: boolean,
-    msg: string,
+    message: string,
     data: {
       items: TMiddleMenu[],
       pagination: {
         page: number, page_size: number, total: number
       }
     }
+  }
+
+  interface TResult {
+    success:boolean,
+    message:string,
+    code:number,
+    data:{
+      items: Array<object>,
+      pagination: {
+        page: number, page_size: number, total: number
+      }
+    },
+  }
+
+  interface TResultOfOp {
+    success:boolean,
+    message:string,
+    code:number,
+    data:{
+      id:number,
+      level:number,
+    },
   }
 }

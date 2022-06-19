@@ -2,7 +2,7 @@
   <div class="zg-menu-top">
     <Row>
       <Col
-        span="18"
+        span="17"
       >
         <ul class="zg-menu-ul">
           <li
@@ -16,6 +16,15 @@
             >{{ item.name }}</a>
           </li>
         </ul>
+      </Col>
+
+      <Col
+        span="1"
+        class="zg-search"
+      >
+        <el-button @click="onSearch">
+          搜索
+        </el-button>
       </Col>
       <Col
         span="4"
@@ -44,6 +53,9 @@
                 <el-dropdown-menu>
                   <el-dropdown-item @click="onUrl">
                     提供收录
+                  </el-dropdown-item>
+                  <el-dropdown-item @click="onCate">
+                    收录类别
                   </el-dropdown-item>
                   <el-dropdown-item @click="onFavoriteUrl">
                     我的收藏
@@ -133,14 +145,20 @@ function onLogin() {
 function onLoginOut() {
   user.token = '';
   user.id = 0;
-  emit('ZgNavClick', 'ZGMiddle');
+  emit('ZgNavClick', 'ZGLogin');
 }
 
 function onUrl() {
   emit('ZgNavClick', 'ZGUrl');
 }
+function onCate() {
+  emit('ZgNavClick', 'ZGCate');
+}
 function onFavoriteUrl() {
   emit('ZgNavClick', 'ZGFavoriteUrl');
+}
+function onSearch() {
+  emit('ZgNavClick', 'ZGSearch');
 }
 </script>
 
@@ -202,4 +220,9 @@ function onFavoriteUrl() {
   text-align: right;
 }
 .zg-menu-ul{}
+.zg-search{
+  display: flex;
+  justify-items: center;
+  align-items: center;
+}
 </style>

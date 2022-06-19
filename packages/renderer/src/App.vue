@@ -9,7 +9,9 @@ import ZGMiddle from '/@/components/ZGMiddle.vue';
 import ZGLogin from '/@/components/ZGLogin.vue';
 import ZGRegister from '/@/components/ZGRegister.vue';
 import ZGUrl from '/@/components/ZGUrl.vue';
+import ZGCate from '/@/components/ZGCate.vue';
 import ZGFavoriteUrl from '/@/components/ZGFavoriteUrl.vue';
+import ZGSearch from '/@/components/ZGSearch.vue';
 import {userStore} from '/@/store/user';
 
 const siteTitle = computed(() => import.meta.env.VITE_SITE_TITLE);
@@ -28,11 +30,17 @@ function onZgNavClick(menu_title=''){
     currentTabComponent.value = ZGLogin;
   }else if(menu_title==='ZGRegister') {
     currentTabComponent.value = ZGRegister;
+  }else if(menu_title==='ZGSearch') {
+    currentTabComponent.value = ZGSearch;
   }else if(menu_title==='ZGUrl') {
-    // console.log(token.value);
     if(token.value.length>=32) {
       currentTabComponent.value = ZGUrl;
-      // ZGUrl.isNeedRefresh = true;
+    }else{
+      currentTabComponent.value = ZGLogin;
+    }
+  }else if(menu_title==='ZGCate') {
+    if(token.value.length>=32) {
+      currentTabComponent.value = ZGCate;
     }else{
       currentTabComponent.value = ZGLogin;
     }

@@ -209,6 +209,7 @@
 <script lang="ts" setup>
 import docUrl from '/@/api/docUrl';
 import {userStore} from '/@/store/user';
+import {docsStore} from '/@/store/docs';
 import type {UploadFile, UploadProps, UploadUserFile, UploadFiles} from 'element-plus';
 import type {TZGCate, TZGUrl} from 'store';
 import docCate from '/@/api/docCate';
@@ -225,6 +226,7 @@ import type {FormInstance} from 'element-plus';
 // }
 
 const store = userStore();
+const docs_store = docsStore();
 
 //表单显示与隐藏属性
 let dialogFormVisible = ref(false);
@@ -411,6 +413,14 @@ watch(() => store.token, (first, second) => {
   }
 });
 
+
+watch(() => docs_store.isNeedRefreshCateOption, (first, second) => {
+  console.log('cate_option changed: first:'+first+'; second:'+second);
+  if(first){
+    refreshCateOptions();
+  }
+});
+
 async function refreshUrlList() {
   const result = await docUrl.myurl(token.value, 1, 200);
   if (result.success) {
@@ -429,11 +439,12 @@ async function refreshUrlList() {
 }
 
 (refreshUrlList)();
-// onMounted(refreshUrlList);
 
-onMounted(async () => {
-  cateOptions.value = await docCate.listByLevel(3);
-});
+async function refreshCateOptions(){
+  cateOptions.value = await docCate.listByLevel(3,1,99999);
+}
+
+onMounted(refreshCateOptions);
 
 const handleRemove: UploadProps['onRemove'] = (file, uploadFiles) => {
   // console.log(file, uploadFiles);

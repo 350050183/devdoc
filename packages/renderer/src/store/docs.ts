@@ -16,6 +16,8 @@ export const docsStore = defineStore('docs', {
       left_menu_id:0,
       middleMenu:[],
       isNeedRefreshFavUrl:false,
+      isNeedRefreshCate:false,
+      isNeedRefreshCateOption:false,
     } as State;
   },
   actions:{

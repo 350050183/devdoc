@@ -13,6 +13,8 @@ const state:State = {
   left_menu_id:0,
   middleMenu:[],
   isNeedRefreshFavUrl: false,
+  isNeedRefreshCate: false,
+  isNeedRefreshCateOption: false,
 };
 
 const mutations = {
