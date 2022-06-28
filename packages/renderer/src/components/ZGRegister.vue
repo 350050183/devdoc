@@ -78,7 +78,6 @@
 <script lang="ts" setup>
 import docUser from '/@/api/docUser';
 import type { FormInstance } from 'element-plus';
-const emit = defineEmits(['ZgNavClick']);
 
 function onLogin() {
   emit('ZgNavClick', 'ZGLogin');

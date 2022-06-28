@@ -12,6 +12,7 @@ import ZGUrl from '/@/components/ZGUrl.vue';
 import ZGCate from '/@/components/ZGCate.vue';
 import ZGFavoriteUrl from '/@/components/ZGFavoriteUrl.vue';
 import ZGSearch from '/@/components/ZGSearch.vue';
+import ZGMap from '/@/components/ZGMap.vue';
 import {userStore} from '/@/store/user';
 
 const siteTitle = computed(() => import.meta.env.VITE_SITE_TITLE);
@@ -30,6 +31,8 @@ function onZgNavClick(menu_title=''){
     currentTabComponent.value = ZGLogin;
   }else if(menu_title==='ZGRegister') {
     currentTabComponent.value = ZGRegister;
+  }else if(menu_title==='ZGMap') {
+    currentTabComponent.value = ZGMap;
   }else if(menu_title==='ZGSearch') {
     currentTabComponent.value = ZGSearch;
   }else if(menu_title==='ZGUrl') {
@@ -60,18 +63,22 @@ function onZgNavClick(menu_title=''){
   <div class="zg-layout">
     <Row class="zg-header">
       <Col
-        span="4"
-        class="zg-logo"
+        span="1"
+        class="zg-center"
       >
-        <div>
-          <img
-            src="/assets/logo.png"
-            class="zg-logo-img"
-          > {{ siteTitle }}
-        </div>
+        <img
+          src="/assets/icon.png"
+          class="zg-logo-img"
+        >
       </Col>
       <Col
-        span="20"
+        span="2"
+        class="zg-center"
+      >
+        {{ siteTitle }}
+      </Col>
+      <Col
+        span="21"
         class="zg-nav-top"
       >
         <div>
@@ -81,18 +88,13 @@ function onZgNavClick(menu_title=''){
     </Row>
     <Row class="zg-middle">
       <Col span="24">
-        <keep-alive>
-          <component
-            :is="currentTabComponent"
-            @ZgNavClick="onZgNavClick"
-          />
-        </keep-alive>
-      </Col>
-    </Row>
-    <div style="height:100px;" />
-    <Row class="zg-footer">
-      <Col span="24">
-        {{ siteCompanyName }}
+        <!--        <keep-alive>-->
+        <!--          <component-->
+        <!--            :is="currentTabComponent"-->
+        <!--            @ZgNavClick="onZgNavClick"-->
+        <!--          />-->
+        <!--        </keep-alive>-->
+        <router-view />
       </Col>
     </Row>
   </div>
@@ -128,17 +130,16 @@ body,a {
   box-shadow: 0 0 8px 0 rgba(0,0,0,0.2);
 }
 
-.zg-header .zg-logo {
+.zg-center {
   display: flex;
   justify-items: center;
   align-items: center;
+  text-align: center;
 }
-.zg-header .zg-logo .zg-logo-img {
-  width:60px;
+.zg-logo-img {
+  width: 50px;
   height: 50px;
-  float:left;
-  padding-left:10px;
-  padding-right:10px;
+  margin-left:10px;
 }
 
 .zg-header .zg-logo div {

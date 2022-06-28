@@ -34,7 +34,7 @@ specifiers:
   vite-plugin-style-import: ^2.0.0
   vitest: 0.5.4
   vue: 3.2.31
-  vue-router: ^4.0.15
+  vue-router: '4'
   vue-tsc: 0.31.4
   vuex: ^4.0.2
   vuex-electron: ^1.0.3

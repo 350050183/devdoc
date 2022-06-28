@@ -107,8 +107,6 @@ const filterTableData = computed(() =>
   ),
 );
 
-const emit = defineEmits(['ZgNavClick']);
-
 const onDelete = async (index: number, row: TZGUrl) => {
   const result = await docFavoriteUrl.del(parseInt(row.id), token.value);
   if (result.success) {
@@ -134,6 +132,8 @@ watch(() => docs_store.isNeedRefreshFavUrl, (first, second) => {
   }
 });
 
+const router = useRouter();
+
 async function refreshUrlList() {
   const result = await docFavoriteUrl.myurl(token.value, 1, 200);
   if (result.success) {
@@ -146,7 +146,7 @@ async function refreshUrlList() {
     if(parseInt(result.code)===5504){
       store.token = '';
       store.id = 0;
-      emit('ZgNavClick','ZGLogin');
+      router.push('ZGLogin');
     }
   }
 }

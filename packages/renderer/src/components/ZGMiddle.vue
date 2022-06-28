@@ -59,12 +59,11 @@
                       <div style="padding-top: 10px;">
                         <el-button
                           v-if="item.is_fav===false"
-                          plain
-                          size="small"
+                          type="warning"
+                          icon="Star"
+                          circle
                           @click="onAddFavorite($event,item.id)"
-                        >
-                          收藏
-                        </el-button>
+                        />
                       </div>
                     </div>
                   </div>

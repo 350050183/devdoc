@@ -1,36 +1,43 @@
 <template>
-  <div class="custom-tree-container">
-    <div class="custom-tree-container-inner">
-      <p class="zg-title">
-        分类管理
-      </p>
-      <el-tree
-        :data="dataSource"
-        node-key="id"
-        default-expand-all
-        :expand-on-click-node="false"
-      >
-        <template #default="{ node, data }">
-          <div class="custom-tree-node">
-            <span class="custom-tree-node-label">{{ node.label }}</span>
-            <span>
-              <a
-                v-if="data.level<3"
-                @click="append(node, data)"
-              > <el-icon><CirclePlusFilled /></el-icon> 增加 </a>
-              <a
-                v-if="data.is_mine===1"
-                @click="edit(node, data)"
-              > <el-icon><Tickets /></el-icon> 编辑 </a>
-              <a
-                v-if="data.children.length<=0 && data.is_mine===1"
-                class="zg-delete"
-                @click="remove(node, data)"
-              > <el-icon><CloseBold /></el-icon> 删除 </a>
-            </span>
-          </div>
-        </template>
-      </el-tree>
+  <div class="container">
+    <div class="zg-breadcrumb">
+      <el-breadcrumb :separator-icon="ArrowRight">
+        <el-breadcrumb-item :to="{ path: '/ZGMap' }">
+          图谱管理
+        </el-breadcrumb-item>
+        <el-breadcrumb-item>节点类别</el-breadcrumb-item>
+      </el-breadcrumb>
+    </div>
+    <div class="custom-tree-container">
+      <div class="custom-tree-container-inner">
+        <el-tree
+          :data="dataSource"
+          node-key="id"
+          default-expand-all
+          :expand-on-click-node="false"
+        >
+          <template #default="{ node, data }">
+            <div class="custom-tree-node">
+              <span class="custom-tree-node-label">{{ node.label }}</span>
+              <span>
+                <a
+                  v-if="data.level<3"
+                  @click="append(node, data)"
+                > <el-icon><CirclePlusFilled /></el-icon> 增加 </a>
+                <a
+                  v-if="data.is_mine===1"
+                  @click="edit(node, data)"
+                > <el-icon><Tickets /></el-icon> 编辑 </a>
+                <a
+                  v-if="data.children.length<=0 && data.is_mine===1"
+                  class="zg-delete"
+                  @click="remove(node, data)"
+                > <el-icon><CloseBold /></el-icon> 删除 </a>
+              </span>
+            </div>
+          </template>
+        </el-tree>
+      </div>
     </div>
   </div>
 </template>
@@ -249,5 +256,11 @@ watch(() => docs_store.isNeedRefreshCate, (first, second) => {
 }
 .zg-delete{
   color:red;
+}
+.container {
+  padding: 20px;
+}
+.zg-breadcrumb{
+  padding:10px 0 30px 0;
 }
 </style>

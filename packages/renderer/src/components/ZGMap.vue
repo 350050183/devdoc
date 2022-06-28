@@ -2,13 +2,12 @@
   <div class="container">
     <div class="zg-breadcrumb">
       <el-breadcrumb :separator-icon="ArrowRight">
-        <el-breadcrumb-item :to="{ path: '/ZGMap' }">
+        <el-breadcrumb-item :to="{ path: '/' }">
           图谱管理
         </el-breadcrumb-item>
-        <el-breadcrumb-item>节点管理</el-breadcrumb-item>
+        <el-breadcrumb-item>节点类别</el-breadcrumb-item>
       </el-breadcrumb>
     </div>
-
     <el-button
       type="primary"
       plain
@@ -21,7 +20,7 @@
       style="width: 100%"
     >
       <el-table-column
-        label="分类"
+        label="图谱分类"
         prop="cate_id"
         width="160"
       >
@@ -30,27 +29,11 @@
         </template>
       </el-table-column>
       <el-table-column
-        label="标题"
+        label="图谱名称"
         prop="title"
       />
       <el-table-column
-        label="网址"
-        prop="url"
-      >
-        <template #default="scope">
-          <a
-            :href="scope.row.url"
-            target="_blank"
-          >{{ scope.row.url }}</a>
-        </template>
-      </el-table-column>
-      <el-table-column
-        label="索引字母"
-        prop="alpha"
-        width="100"
-      />
-      <el-table-column
-        label="logo"
+        label="图谱LOGO"
         prop="logo"
         width="100"
       >
@@ -66,11 +49,7 @@
         width="200"
       >
         <template #header>
-          <el-input
-            v-model="search"
-            size="small"
-            placeholder="搜索标题"
-          />
+          搜索
         </template>
         <template #default="scope">
           <el-button
@@ -91,6 +70,33 @@
               </el-button>
             </template>
           </el-popconfirm>
+        </template>
+      </el-table-column>
+
+      <el-table-column
+        align="right"
+        width="250"
+      >
+        <template #header>
+          <el-input
+            v-model="search"
+            size="small"
+            placeholder="搜索名称"
+          />
+        </template>
+        <template #default="scope">
+          <el-button
+            size="large"
+            @click="onNodeCate(scope.$index, scope.row)"
+          >
+            节点类别
+          </el-button>
+          <el-button
+            size="large"
+            @click="onNode(scope.$index, scope.row)"
+          >
+            节点管理
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -360,7 +366,6 @@ let ruleForm = reactive({
   description: '',
 });
 
-
 const onSave = (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   formEl.validate(async (valid) => {
@@ -412,6 +417,16 @@ const onDelete = async (index: number, row: TZGUrl) => {
   }
 };
 
+const router = useRouter();
+
+const onNodeCate = (index: number, row: TZGUrl) => {
+  router.push('ZGCate');
+};
+
+const onNode = (index: number, row: TZGUrl) => {
+  router.push('ZGUrl');
+};
+
 const token = computed(() => store.token);
 
 watch(() => store.token, (first, second) => {
@@ -429,8 +444,6 @@ watch(() => docs_store.isNeedRefreshCateOption, (first, second) => {
   }
 });
 
-const router = useRouter();
-
 async function refreshUrlList() {
   const result = await docUrl.myurl(token.value, 1, 200);
   if (result.success) {
@@ -443,7 +456,7 @@ async function refreshUrlList() {
     if(parseInt(result.code)===5504){
       store.token = '';
       store.id = 0;
-      router.push('ZGLogin');
+      emit('ZgNavClick','ZGLogin');
     }
   }
 }
@@ -499,11 +512,11 @@ const handleSuccess: UploadProps['onSuccess'] = (result: any, ufile: UploadFile,
 .container {
   padding: 20px;
 }
+.zg-breadcrumb{
+  padding:10px 0 30px 0;
+}
 
 .logo {
   height: 30px;
-}
-.zg-breadcrumb{
-  padding:10px 0 30px 0;
 }
 </style>

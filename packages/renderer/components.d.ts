@@ -5,6 +5,8 @@ import '@vue/runtime-core'
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    ElBreadcrumb: typeof import('element-plus/es')['ElBreadcrumb']
+    ElBreadcrumbItem: typeof import('element-plus/es')['ElBreadcrumbItem']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCol: typeof import('element-plus/es')['ElCol']
     ElDialog: typeof import('element-plus/es')['ElDialog']
@@ -33,6 +35,7 @@ declare module '@vue/runtime-core' {
     ZGCate: typeof import('./src/components/ZGCate.vue')['default']
     ZGFavoriteUrl: typeof import('./src/components/ZGFavoriteUrl.vue')['default']
     ZGLogin: typeof import('./src/components/ZGLogin.vue')['default']
+    ZGMap: typeof import('./src/components/ZGMap.vue')['default']
     ZGMenuTop: typeof import('./src/components/ZGMenuTop.vue')['default']
     ZGMiddle: typeof import('./src/components/ZGMiddle.vue')['default']
     ZGRegister: typeof import('./src/components/ZGRegister.vue')['default']

@@ -22,9 +22,11 @@
         span="1"
         class="zg-search"
       >
-        <el-button @click="onSearch">
-          搜索
-        </el-button>
+        <el-button
+          icon="Search"
+          circle
+          @click="onSearch"
+        />
       </Col>
       <Col
         span="4"
@@ -51,11 +53,14 @@
               </el-button>
               <template #dropdown>
                 <el-dropdown-menu>
+                  <el-dropdown-item @click="onMap">
+                    图谱管理
+                  </el-dropdown-item>
                   <el-dropdown-item @click="onUrl">
-                    提供收录
+                    节点管理
                   </el-dropdown-item>
                   <el-dropdown-item @click="onCate">
-                    收录类别
+                    类别管理
                   </el-dropdown-item>
                   <el-dropdown-item @click="onFavoriteUrl">
                     我的收藏
@@ -118,7 +123,7 @@ const store = docsStore();
 
 function activeMenu(e: Event) {
 
-  emit('ZgNavClick', 'ZGMiddle');
+  router.push('ZGMiddle');
 
   const parent_id = (e.target as HTMLElement).getAttribute('rel');
   store.setValue(parent_id ?? '');
@@ -134,31 +139,34 @@ function activeMenu(e: Event) {
   (e.target as HTMLElement).className = 'zg-menu-top-active';
 }
 
-//defineProps and defineEmits are compiler macros only usable inside <script setup>. They do not need to be imported,
-// and are compiled away when <script setup> is processed.
-const emit = defineEmits(['ZgNavClick']);
 
 function onLogin() {
-  emit('ZgNavClick', 'ZGLogin');
+  router.push('ZGLogin');
 }
 
 function onLoginOut() {
   user.token = '';
   user.id = 0;
-  emit('ZgNavClick', 'ZGLogin');
+  router.push('ZGLogin');
 }
 
+const router = useRouter();
+// const route = useRoute();
+
+function onMap() {
+  router.push('ZGMap');
+}
 function onUrl() {
-  emit('ZgNavClick', 'ZGUrl');
+  router.push('ZGUrl');
 }
 function onCate() {
-  emit('ZgNavClick', 'ZGCate');
+  router.push('ZGCate');
 }
 function onFavoriteUrl() {
-  emit('ZgNavClick', 'ZGFavoriteUrl');
+  router.push('ZGFavoriteUrl');
 }
 function onSearch() {
-  emit('ZgNavClick', 'ZGSearch');
+  router.push('ZGSearch');
 }
 </script>
 

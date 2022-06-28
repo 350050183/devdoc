@@ -74,10 +74,11 @@ import {docsStore} from '/@/store/docs';
 const store = userStore();
 const docs_store = docsStore();
 
-const emit = defineEmits(['ZgNavClick']);
+
+const router = useRouter();
 
 function onRegister() {
-  emit('ZgNavClick', 'ZGRegister');
+  router.push('ZGRegister');
 }
 
 const ruleForm = reactive({

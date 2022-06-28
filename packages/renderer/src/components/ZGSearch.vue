@@ -96,7 +96,6 @@ const filterTableData = computed(() =>
   ),
 );
 
-const emit = defineEmits(['ZgNavClick']);
 
 const token = computed(() => store.token);
 
@@ -106,6 +105,8 @@ watch(() => store.token, (first, second) => {
     refreshUrlList();
   }
 });
+
+const router = useRouter();
 
 async function refreshUrlList() {
   const result = await docUrl.search(1, 200);
@@ -119,7 +120,7 @@ async function refreshUrlList() {
     if(parseInt(result.code)===5504){
       store.token = '';
       store.id = 0;
-      emit('ZgNavClick','ZGLogin');
+      router.push('ZGLogin');
     }
   }
 }

@@ -6,8 +6,11 @@ import ElementPlus from 'element-plus';
 // @ts-ignore
 import * as ElementPlusIconsVue from '@element-plus/icons-vue';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
+import router from '/@/router/index';
 
 const app = createApp(App);
+
+app.use(router);
 
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
