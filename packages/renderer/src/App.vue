@@ -3,60 +3,10 @@
 // import ReactiveHash from '/@/components/ReactiveHash.vue';
 // import ElectronVersions from '/@/components/ElectronVersions.vue';
 import {Row, Col} from 'vant';
-// import ZGSideBar from '/@/components/ZGSideBar.vue';
 import ZGMenuTop from '/@/components/ZGMenuTop.vue';
-import ZGMiddle from '/@/components/ZGMiddle.vue';
-import ZGLogin from '/@/components/ZGLogin.vue';
-import ZGRegister from '/@/components/ZGRegister.vue';
-import ZGUrl from '/@/components/ZGUrl.vue';
-import ZGCate from '/@/components/ZGCate.vue';
-import ZGFavoriteUrl from '/@/components/ZGFavoriteUrl.vue';
-import ZGSearch from '/@/components/ZGSearch.vue';
-import ZGMap from '/@/components/ZGMap.vue';
 import {userStore} from '/@/store/user';
-
-const siteTitle = computed(() => import.meta.env.VITE_SITE_TITLE);
-const siteCompanyName = computed(() => import.meta.env.VITE_SITE_COMPANY_NAME);
-
-let currentTabComponent = shallowRef({});
-
-currentTabComponent.value = ZGMiddle;
-
 const store = userStore();
-const token = computed(() => store.token);
-
-function onZgNavClick(menu_title=''){
-  console.log('ZgNavClick',menu_title);
-  if(menu_title==='ZGLogin') {
-    currentTabComponent.value = ZGLogin;
-  }else if(menu_title==='ZGRegister') {
-    currentTabComponent.value = ZGRegister;
-  }else if(menu_title==='ZGMap') {
-    currentTabComponent.value = ZGMap;
-  }else if(menu_title==='ZGSearch') {
-    currentTabComponent.value = ZGSearch;
-  }else if(menu_title==='ZGUrl') {
-    if(token.value.length>=32) {
-      currentTabComponent.value = ZGUrl;
-    }else{
-      currentTabComponent.value = ZGLogin;
-    }
-  }else if(menu_title==='ZGCate') {
-    if(token.value.length>=32) {
-      currentTabComponent.value = ZGCate;
-    }else{
-      currentTabComponent.value = ZGLogin;
-    }
-  }else if(menu_title==='ZGFavoriteUrl') {
-    if(token.value.length>=32) {
-      currentTabComponent.value = ZGFavoriteUrl;
-    }else{
-      currentTabComponent.value = ZGLogin;
-    }
-  }else{
-    currentTabComponent.value = ZGMiddle;
-  }
-}
+const siteTitle = computed(() => import.meta.env.VITE_SITE_TITLE);
 </script>
 
 <template>
@@ -67,33 +17,34 @@ function onZgNavClick(menu_title=''){
         class="zg-center"
       >
         <img
-          src="/assets/icon.png"
+          src="/assets/logo.png"
           class="zg-logo-img"
         >
       </Col>
       <Col
-        span="2"
+        span="1"
         class="zg-center"
       >
-        {{ siteTitle }}
+        <div>
+          <div class="zg-main-site-title">
+            {{ siteTitle }}
+          </div>
+          <div class="zg-my-site-title">
+            {{ store.default_map_name }}
+          </div>
+        </div>
       </Col>
       <Col
         span="21"
         class="zg-nav-top"
       >
         <div>
-          <ZGMenuTop @ZgNavClick="onZgNavClick" />
+          <ZGMenuTop />
         </div>
       </Col>
     </Row>
     <Row class="zg-middle">
       <Col span="24">
-        <!--        <keep-alive>-->
-        <!--          <component-->
-        <!--            :is="currentTabComponent"-->
-        <!--            @ZgNavClick="onZgNavClick"-->
-        <!--          />-->
-        <!--        </keep-alive>-->
         <router-view />
       </Col>
     </Row>
@@ -130,12 +81,6 @@ body,a {
   box-shadow: 0 0 8px 0 rgba(0,0,0,0.2);
 }
 
-.zg-center {
-  display: flex;
-  justify-items: center;
-  align-items: center;
-  text-align: center;
-}
 .zg-logo-img {
   width: 50px;
   height: 50px;
@@ -177,4 +122,23 @@ body,a {
   background-color: beige;
 }
 
+.zg-center {
+  display: flex;
+  justify-items: center;
+  align-items: center;
+  text-align: center;
+  /*flex-flow: column;*/
+  /*flex-direction: column;*/
+}
+
+.zg-main-site-title{
+  /*display: flex;*/
+  font-size:15px;
+}
+
+.zg-my-site-title{
+  /*display: flex;*/
+  font-size:11px;
+  color:#999;
+}
 </style>

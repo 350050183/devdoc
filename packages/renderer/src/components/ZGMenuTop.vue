@@ -13,7 +13,7 @@
               href="#"
               :rel="item.id.toString()"
               @click="activeMenu"
-            >{{ item.name }}</a>
+            >{{ item.title }}</a>
           </li>
         </ul>
       </Col>
@@ -54,16 +54,10 @@
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item @click="onMap">
-                    图谱管理
+                    收藏夹管理
                   </el-dropdown-item>
-                  <el-dropdown-item @click="onUrl">
-                    节点管理
-                  </el-dropdown-item>
-                  <el-dropdown-item @click="onCate">
-                    类别管理
-                  </el-dropdown-item>
-                  <el-dropdown-item @click="onFavoriteUrl">
-                    我的收藏
+                  <el-dropdown-item @click="onFavoriteNode">
+                    我喜欢的
                   </el-dropdown-item>
 
                   <el-dropdown-item
@@ -91,27 +85,36 @@
 <script lang="ts" setup>
 import {Row, Col} from 'vant';
 
-import docCate from '/@/api/docCate';
+import docNodeCate from '/@/api/docNodeCate';
 import {docsStore} from '/@/store/docs';
 import {userStore} from '/@/store/user';
 
 const user = userStore();
+const store = docsStore();
 const token = computed(() => user.token);
 const userEmail = computed(() => user.email);
 
+watch(() => store.isNeedRefreshCate, (first, second) => {
+  console.log('cate changed: first:'+first+'; second:'+second);
+  if(first){
+    refreshCate();
+  }
+});
+
 interface DocItem {
   id: number,
-  name: string
+  title: string
 }
 
 const list: Array<DocItem> = [];
 const topMenuItems = ref(list);
 // watch({list},(newValue)=>{});
+const refreshCate = async () =>{
+  topMenuItems.value = await docNodeCate.index(0, user.default_map_id);
+};
 
 //Way 1:
-(async () => {
-  topMenuItems.value = await docCate.index();
-})();
+(refreshCate)();
 
 //Way 2:
 // onMounted(async () => {
@@ -119,15 +122,14 @@ const topMenuItems = ref(list);
 //   topMenuItems.value = res.data.data.items;
 // });
 
-const store = docsStore();
 
 function activeMenu(e: Event) {
 
-  router.push('ZGMiddle');
+  router.push('/ZGMiddle');
 
   const parent_id = (e.target as HTMLElement).getAttribute('rel');
   store.setValue(parent_id ?? '');
-  store.getLeftMenu();
+  store.getLeftMenu(user.default_map_id);
 
   const nodes = document.querySelectorAll('ul.zg-menu-ul a');
   let el: object;
@@ -141,32 +143,32 @@ function activeMenu(e: Event) {
 
 
 function onLogin() {
-  router.push('ZGLogin');
+  router.push('/ZGLogin');
 }
 
 function onLoginOut() {
   user.token = '';
   user.id = 0;
-  router.push('ZGLogin');
+  // user.default_map_id = 1;
+  user.nickname = '';
+  user.mobile = '';
+  user.avatar = '';
+
+  store.isNeedRefreshCate = true;
+  router.push('/ZGLogin');
 }
 
 const router = useRouter();
 // const route = useRoute();
 
 function onMap() {
-  router.push('ZGMap');
+  router.push('/ZGMap');
 }
-function onUrl() {
-  router.push('ZGUrl');
-}
-function onCate() {
-  router.push('ZGCate');
-}
-function onFavoriteUrl() {
-  router.push('ZGFavoriteUrl');
+function onFavoriteNode() {
+  router.push('/ZGFavoriteNode');
 }
 function onSearch() {
-  router.push('ZGSearch');
+  router.push('/ZGSearch');
 }
 </script>
 
@@ -228,6 +230,9 @@ function onSearch() {
   text-align: right;
 }
 .zg-menu-ul{}
+.zg-menu-ul a{
+  font-size:16px;
+}
 .zg-search{
   display: flex;
   justify-items: center;

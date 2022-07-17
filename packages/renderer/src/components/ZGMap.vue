@@ -3,9 +3,9 @@
     <div class="zg-breadcrumb">
       <el-breadcrumb :separator-icon="ArrowRight">
         <el-breadcrumb-item :to="{ path: '/' }">
-          图谱管理
+          首页
         </el-breadcrumb-item>
-        <el-breadcrumb-item>节点类别</el-breadcrumb-item>
+        <el-breadcrumb-item>收藏夹管理</el-breadcrumb-item>
       </el-breadcrumb>
     </div>
     <el-button
@@ -20,7 +20,7 @@
       style="width: 100%"
     >
       <el-table-column
-        label="图谱分类"
+        label="收藏夹分类"
         prop="cate_id"
         width="160"
       >
@@ -29,17 +29,17 @@
         </template>
       </el-table-column>
       <el-table-column
-        label="图谱名称"
+        label="收藏夹名称"
         prop="title"
       />
       <el-table-column
-        label="图谱LOGO"
+        label="收藏夹图标"
         prop="logo"
         width="100"
       >
         <template #default="scope">
           <img
-            :src="scope.row.logo"
+            :src="logo_url(scope.row.logo)"
             class="logo"
           >
         </template>
@@ -87,15 +87,16 @@
         <template #default="scope">
           <el-button
             size="large"
-            @click="onNodeCate(scope.$index, scope.row)"
+            :disabled="parseInt(scope.row.id)===store.default_map_id"
+            @click="onSetDefaultMap(scope.$index, scope.row)"
           >
-            节点类别
+            设为默认
           </el-button>
           <el-button
             size="large"
             @click="onNode(scope.$index, scope.row)"
           >
-            节点管理
+            网址管理
           </el-button>
         </template>
       </el-table-column>
@@ -103,7 +104,7 @@
 
     <el-dialog
       v-model="dialogFormVisible"
-      title="管理节点"
+      title="管理网址"
     >
       <el-form
         ref="ruleFormRef"
@@ -121,16 +122,6 @@
           />
         </el-form-item>
 
-        <el-form-item
-          label="URL"
-          label-width="120px"
-          prop="url"
-        >
-          <el-input
-            v-model="ruleForm.url"
-            autocomplete="off"
-          />
-        </el-form-item>
 
         <el-form-item
           label="简短介绍"
@@ -156,21 +147,10 @@
             <el-option
               v-for="item in cateOptions"
               :key="item.id"
-              :label="item.name"
+              :label="item.title"
               :value="item.id"
             />
           </el-select>
-        </el-form-item>
-
-        <el-form-item
-          label="索引字母"
-          label-width="120px"
-          prop="alpha"
-        >
-          <el-input
-            v-model="ruleForm.alpha"
-            autocomplete="off"
-          />
         </el-form-item>
 
         <el-form-item
@@ -179,7 +159,7 @@
           prop="logo"
         >
           <el-upload
-            :action="docUrl.api_docurl_upload"
+            :action="docMap.api_docNode_upload"
             :on-success="handleSuccess"
             :on-preview="handlePreview"
             :on-remove="handleRemove"
@@ -199,8 +179,8 @@
               </div>
               <div>
                 <img
-                  v-if="ruleForm.logo"
-                  :src="ruleForm.logo"
+                  v-if="ruleForm.logo_url"
+                  :src="ruleForm.logo_url"
                   style="width:100px;height:60px"
                 >
               </div>
@@ -222,13 +202,15 @@
 </template>
 
 <script lang="ts" setup>
-import docUrl from '/@/api/docUrl';
+import docMap from '/@/api/docMap';
 import {userStore} from '/@/store/user';
 import {docsStore} from '/@/store/docs';
 import type {UploadFile, UploadProps, UploadUserFile, UploadFiles} from 'element-plus';
-import type {TZGCate, TZGUrl} from 'store';
-import docCate from '/@/api/docCate';
+import type {TZGNodeCate, TZGNode} from 'store';
+import docMapCate from '/@/api/docMapCate';
 import type {FormInstance} from 'element-plus';
+import { ArrowRight } from '@element-plus/icons-vue';
+import docMapDefault from '/@/api/docMapDefault';
 //import docUser from '/@/api/docUser';
 
 // const props = defineProps({
@@ -237,7 +219,7 @@ import type {FormInstance} from 'element-plus';
 
 // if(props.isNeedRefresh){
 //   console.log('isNeedRefresh');
-//   refreshUrlList();
+//   refreshMap();
 // }
 
 const store = userStore();
@@ -250,10 +232,10 @@ const search = ref('');
 //表单实例
 const ruleFormRef = ref<FormInstance>();
 //表格列表数据
-const list: Array<TZGUrl> = [];
+const list: Array<TZGNode> = [];
 let tableData = ref(list);
 //类型选择
-const list2: Array<TZGCate> = [];
+const list2: Array<TZGNodeCate> = [];
 let cateOptions = ref(list2);
 //文件上传
 const fileList = ref<UploadUserFile[]>([
@@ -263,7 +245,9 @@ const fileList = ref<UploadUserFile[]>([
   // }
 ]);
 
-const cate_name = (cate_id: string) => cateOptions.value.filter((row) => row.id === cate_id)?.[0].name;
+const logo_url = (url:string)=>import.meta.env.VITE_API_SERVER_URL + url;
+
+const cate_name = (cate_id: string) => cateOptions.value.filter((row) => row.id === cate_id)?.[0]?.title;
 
 const filterTableData = computed(() =>
   tableData.value.filter(
@@ -311,28 +295,6 @@ const validateCateId = (rule: any, value: string, callback: any) => {
     }
   }
 };
-const validateAlpha = (rule: any, value: string, callback: any) => {
-  if (!value || value === '') {
-    callback(new Error('请输入索引字母'));
-  } else {
-    if (value.length != 1) {
-      callback(new Error('索引字母只能是1位'));
-    } else {
-      callback();
-    }
-  }
-};
-const validateUrl = (rule: any, value: string, callback: any) => {
-  if (!value || value === '') {
-    callback(new Error('请输入URL'));
-  } else {
-    if (value.length < 6) {
-      callback(new Error('URL不能少于6位'));
-    } else {
-      callback();
-    }
-  }
-};
 const validateLogo = (rule: any, value: string, callback: any) => {
   if (!value || value === '') {
     callback(new Error('请上传LOGO文件'));
@@ -347,22 +309,18 @@ const validateLogo = (rule: any, value: string, callback: any) => {
 
 const rules = reactive({
   title: [{validator: validateTitle, trigger: 'blur'}],
-  url: [{validator: validateUrl, trigger: 'blur'}],
   description: [{validator: validateDescription, trigger: 'blur'}],
   cate_id: [{validator: validateCateId, trigger: 'blur'}],
   logo: [{validator: validateLogo, trigger: 'blur'}],
-  alpha: [{validator: validateAlpha, trigger: 'blur'}],
 });
 
 let ruleForm = reactive({
   id: '',
   cate_id: '',
   title: '',
-  url: '',
-  icon_class: '',
-  alpha: '',
   is_new: '',
   logo: '',
+  logo_url: '',
   description: '',
 });
 
@@ -370,15 +328,14 @@ const onSave = (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   formEl.validate(async (valid) => {
     if (valid) {
-      const result = await (ruleForm.id ? docUrl.edit(ruleForm, token.value) : docUrl.add(ruleForm, token.value));
+      const result = await (ruleForm.id ? docMap.edit(ruleForm, token.value) : docMap.add(ruleForm, token.value));
       if (result.success) {
         ElMessage({
           message: '操作成功。',
           type: 'success',
         });
         dialogFormVisible.value = false;
-        // emit('ZgNavClick', 'ZGUrl');
-        await refreshUrlList();
+        await refreshMap();
       } else {
         ElMessage({
           message: '操作失败：' + result.message,
@@ -390,25 +347,24 @@ const onSave = (formEl: FormInstance | undefined) => {
   return false;
 };
 
-const onEdit = (index: number, row: TZGUrl) => {
+const onEdit = (index: number, row: TZGNode) => {
   ruleForm.id = row.id;
   ruleForm.cate_id = row.cate_id;
   ruleForm.title = row.title;
-  ruleForm.url = row.url;
-  ruleForm.alpha = row.alpha;
   ruleForm.logo = row.logo;
+  ruleForm.logo_url = import.meta.env.VITE_API_SERVER_URL + row.logo;
   ruleForm.description = row.description;
   dialogFormVisible.value = true;
 };
 
-const onDelete = async (index: number, row: TZGUrl) => {
-  const result = await docUrl.del(parseInt(row.id), token.value);
+const onDelete = async (index: number, row: TZGNode) => {
+  const result = await docMap.del(parseInt(row.id), token.value);
   if (result.success) {
     ElMessage({
       message: '删除成功。',
       type: 'success',
     });
-    await refreshUrlList();
+    await refreshMap();
   } else {
     ElMessage({
       message: '删除失败：' + result.message,
@@ -419,12 +375,28 @@ const onDelete = async (index: number, row: TZGUrl) => {
 
 const router = useRouter();
 
-const onNodeCate = (index: number, row: TZGUrl) => {
-  router.push('ZGCate');
+const onNode = (index: number, row: TZGNode) => {
+  router.push('/ZGNode/'+row.id);
 };
 
-const onNode = (index: number, row: TZGUrl) => {
-  router.push('ZGUrl');
+const onSetDefaultMap = async (index: number, row: TZGNode) => {
+  docs_store.isNeedRefreshCate = false;
+  store.default_map_id = parseInt(row.id);
+  store.default_map_name = row.title;
+  const result = await docMapDefault.add(parseInt(row.id), token.value);
+  if (result.success) {
+    ElMessage({
+      message: '设置成功。',
+      type: 'success',
+    });
+    await refreshMap();
+    docs_store.isNeedRefreshCate = true;
+  } else {
+    ElMessage({
+      message: '设置失败：' + result.message,
+      type: 'error',
+    });
+  }
 };
 
 const token = computed(() => store.token);
@@ -432,7 +404,7 @@ const token = computed(() => store.token);
 watch(() => store.token, (first, second) => {
   console.log('token changed: first:'+first+'; second:'+second);
   if(first && first!==second){
-    refreshUrlList();
+    refreshMap();
   }
 });
 
@@ -444,27 +416,28 @@ watch(() => docs_store.isNeedRefreshCateOption, (first, second) => {
   }
 });
 
-async function refreshUrlList() {
-  const result = await docUrl.myurl(token.value, 1, 200);
+async function refreshMap() {
+  const result = await docMap.myurl(token.value, 1, 200);
   if (result.success) {
     tableData.value = result.data.items;
   } else {
-    ElMessage({
-      message: '错误：' + result.message,
-      type: 'error',
-    });
     if(parseInt(result.code)===5504){
       store.token = '';
       store.id = 0;
-      emit('ZgNavClick','ZGLogin');
+      await router.push('/ZGLogin');
+    }else{
+      ElMessage({
+        message: '错误：' + result.message,
+        type: 'error',
+      });
     }
   }
 }
 
-(refreshUrlList)();
+(refreshMap)();
 
 async function refreshCateOptions(){
-  cateOptions.value = await docCate.listByLevel(3,1,99999);
+  cateOptions.value = await docMapCate.listByLevel(1,1,99999);
 }
 
 onMounted(refreshCateOptions);
@@ -497,7 +470,8 @@ const beforeRemove: UploadProps['beforeRemove'] = (uploadFile, uploadFiles) => {
 
 const handleSuccess: UploadProps['onSuccess'] = (result: any, ufile: UploadFile, ufiles: UploadFiles) => {
   if (result.success) {
-    ruleForm.logo = import.meta.env.VITE_API_SERVER_URL + result.data.logo;
+    ruleForm.logo = result.data.logo;
+    ruleForm.logo_url = import.meta.env.VITE_API_SERVER_URL + result.data.logo;
     fileList.value = [];
   } else {
     ElMessage({

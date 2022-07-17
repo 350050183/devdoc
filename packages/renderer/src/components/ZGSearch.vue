@@ -8,7 +8,7 @@
       >
         <el-input
           v-model="search"
-          size="big"
+          size="large"
           placeholder="搜索标题"
         />
       </el-col>
@@ -43,18 +43,13 @@
         </template>
       </el-table-column>
       <el-table-column
-        label="索引字母"
-        prop="alpha"
-        width="100"
-      />
-      <el-table-column
-        label="logo"
+        label="LOGO"
         prop="logo"
         width="100"
       >
         <template #default="scope">
           <img
-            :src="scope.row.logo"
+            :src="logo_url(scope.row.logo)"
             class="logo"
           >
         </template>
@@ -68,11 +63,10 @@
 </template>
 
 <script lang="ts" setup>
-import docUrl from '/@/api/docUrl';
+import docNode from '/@/api/docNode';
 import {userStore} from '/@/store/user';
-import type {TZGCate, TZGUrl} from 'store';
-import type {FormInstance} from 'element-plus';
-import docCate from '/@/api/docCate';
+import type {TZGNodeCate, TZGNode} from 'store';
+import docNodeCate from '/@/api/docNodeCate';
 
 
 const store = userStore();
@@ -80,13 +74,15 @@ const store = userStore();
 //搜索关键词属性
 const search = ref('');
 //表格列表数据
-const list: Array<TZGUrl> = [];
+const list: Array<TZGNode> = [];
 let tableData = ref(list);
 //类型选择
-const list2: Array<TZGCate> = [];
+const list2: Array<TZGNodeCate> = [];
 let cateOptions = ref(list2);
 
-const cate_name = (cate_id: string) => cateOptions.value.filter((row) => row.id === cate_id)?.[0].name;
+const logo_url = (url:string)=>import.meta.env.VITE_API_SERVER_URL + url;
+
+const cate_name = (cate_id: string) => cateOptions.value.filter((row) => row.id === cate_id)?.[0]?.title;
 
 const filterTableData = computed(() =>
   tableData.value.filter(
@@ -97,19 +93,19 @@ const filterTableData = computed(() =>
 );
 
 
-const token = computed(() => store.token);
+// const token = computed(() => store.token);
 
 watch(() => store.token, (first, second) => {
   console.log('token changed: first:'+first+'; second:'+second);
   if(first && first!==second){
-    refreshUrlList();
+    refreshNodeList();
   }
 });
 
 const router = useRouter();
 
-async function refreshUrlList() {
-  const result = await docUrl.search(1, 200);
+async function refreshNodeList() {
+  const result = await docNode.search(store.default_map_id,1, 200);
   if (result.success) {
     tableData.value = result.data.items;
   } else {
@@ -120,15 +116,15 @@ async function refreshUrlList() {
     if(parseInt(result.code)===5504){
       store.token = '';
       store.id = 0;
-      router.push('ZGLogin');
+      await router.push('/ZGLogin');
     }
   }
 }
 
-(refreshUrlList)();
+(refreshNodeList)();
 
 async function refreshCateOptions(){
-  cateOptions.value = await docCate.listByLevel(3,1,99999);
+  cateOptions.value = await docNodeCate.listByLevel(3, store.default_map_id,1,99999);
 }
 
 onMounted(refreshCateOptions);

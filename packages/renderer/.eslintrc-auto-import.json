@@ -7,6 +7,8 @@
     "defineComponent": true,
     "effectScope": true,
     "EffectScope": true,
+    "ElBreadcrumb": true,
+    "ElBreadcrumbItem": true,
     "ElButton": true,
     "ElCol": true,
     "ElDialog": true,

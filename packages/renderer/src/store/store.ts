@@ -1,8 +1,8 @@
 import type {InjectionKey} from 'vue';
 import type {Store,Commit} from 'vuex';
 import {createStore, useStore as baseUseStore} from 'vuex';
-import docCate from '/@/api/docCate';
-import docUrl from '/@/api/docUrl';
+import docNodeCate from '/@/api/docNodeCate';
+import docNode from '/@/api/docNode';
 import type {State, TMiddleResultType, TResultType} from 'store';
 
 const state:State = {
@@ -15,6 +15,7 @@ const state:State = {
   isNeedRefreshFavUrl: false,
   isNeedRefreshCate: false,
   isNeedRefreshCateOption: false,
+  map_id: 0,
 };
 
 const mutations = {
@@ -34,12 +35,12 @@ const mutations = {
 
 const actions = {
   async getLeftMenu({ commit }:{commit:Commit}) {
-    const result: TResultType = await docCate.tree(state.parent_id);
+    const result: TResultType = await docNodeCate.tree(state.parent_id,state.map_id);
     commit('setLeftMenu', result.data.items);
     commit('setMiddleList',[]);
   },
   async getMiddleList({ commit }:{commit:Commit}) {
-    const result: TMiddleResultType = await docUrl.tree(state.left_menu_id,'');
+    const result: TMiddleResultType = await docNode.tree(state.left_menu_id,'');
     commit('setMiddleList', result.data.items);
   },
 };

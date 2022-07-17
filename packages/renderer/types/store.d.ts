@@ -18,6 +18,7 @@ declare module 'store' {
     isNeedRefreshFavUrl: boolean,
     isNeedRefreshCate: boolean,
     isNeedRefreshCateOption: boolean,
+    map_id: number
   }
 
   interface User {
@@ -27,9 +28,11 @@ declare module 'store' {
     mobile:string,
     token: string,
     nickname: string,
+    default_map_id: number,
+    default_map_name: string,
   }
 
-  interface TZGUrl {
+  interface TZGNode {
     id:string,
     cate_id: string;
     title: string;
@@ -41,15 +44,24 @@ declare module 'store' {
     description: string;
   }
 
-  interface TZGCate {
+  interface TZGNodeCate {
     id:string,
-    name: string;
+    title: string;
     parent_id: string;
   }
 
+  interface TZGTree {
+    id: string
+    label: string
+    level: number
+    is_mine: number
+    children?: TZGTree[]
+  }
+
   interface TLeftMenu {
+    id: string,
     text: string,
-    children: { 'text': string, 'id': number }[],
+    children: TLeftMenu[],
   }
 
   interface TResultType {

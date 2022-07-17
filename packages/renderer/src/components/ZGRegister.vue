@@ -79,8 +79,10 @@
 import docUser from '/@/api/docUser';
 import type { FormInstance } from 'element-plus';
 
+const router = useRouter();
+
 function onLogin() {
-  emit('ZgNavClick', 'ZGLogin');
+  router.push('/ZGLogin');
 }
 
 const ruleForm = reactive({

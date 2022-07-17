@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia';
 import type { TMiddleResultType, TResultType} from 'store';
 import type {State} from 'store';
-import docCate from '/@/api/docCate';
-import docUrl from '/@/api/docUrl';
+import docNodeCate from '/@/api/docNodeCate';
+import docNode from '/@/api/docNode';
 
 // useStore could be anything like useUser, useCart
 // the first argument is a unique id of the store across your application
@@ -18,6 +18,7 @@ export const docsStore = defineStore('docs', {
       isNeedRefreshFavUrl:false,
       isNeedRefreshCate:false,
       isNeedRefreshCateOption:false,
+      map_id:0,
     } as State;
   },
   actions:{
@@ -33,13 +34,13 @@ export const docsStore = defineStore('docs', {
     setMiddleList(payload: []) {
       this.middleMenu = payload;
     },
-    async getLeftMenu() {
-      const result: TResultType = await docCate.tree(this.parent_id);
+    async getLeftMenu(map_id:number) {
+      const result: TResultType = await docNodeCate.tree(this.parent_id,map_id);
       this.leftMenu = result.data.items;
       this.middleMenu = [];
     },
     async getMiddleList(id:number,token:string) {
-      const result: TMiddleResultType = await docUrl.tree(id,token);
+      const result: TMiddleResultType = await docNode.tree(id,token);
       this.middleMenu = result.data.items;
     },
   },

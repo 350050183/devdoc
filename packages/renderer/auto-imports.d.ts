@@ -29,6 +29,7 @@ declare global {
   const ElTable: typeof import('element-plus/es')['ElTable']
   const ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
   const ElTree: typeof import('element-plus/es')['ElTree']
+  const ElTreeSelect: typeof import('element-plus/es')['ElTreeSelect']
   const ElUpload: typeof import('element-plus/es')['ElUpload']
   const getCurrentInstance: typeof import('vue')['getCurrentInstance']
   const getCurrentScope: typeof import('vue')['getCurrentScope']

@@ -2,14 +2,26 @@
   <div class="container">
     <div class="zg-breadcrumb">
       <el-breadcrumb :separator-icon="ArrowRight">
-        <el-breadcrumb-item :to="{ path: '/ZGMap' }">
-          图谱管理
+        <el-breadcrumb-item :to="{ path: '/' }">
+          首页
         </el-breadcrumb-item>
-        <el-breadcrumb-item>节点类别</el-breadcrumb-item>
+        <el-breadcrumb-item :to="{path:'/ZGMap'}">
+          收藏夹管理
+        </el-breadcrumb-item>
+        <el-breadcrumb-item :to="{path:'/ZGNode/'+map_id}">
+          网址管理
+        </el-breadcrumb-item>
+        <el-breadcrumb-item>
+          网址类别
+        </el-breadcrumb-item>
       </el-breadcrumb>
     </div>
     <div class="custom-tree-container">
       <div class="custom-tree-container-inner">
+        <el-button @click="onAddCate">
+          增加顶级类别
+        </el-button>
+        <br>
         <el-tree
           :data="dataSource"
           node-key="id"
@@ -44,25 +56,35 @@
 
 <script lang="ts" setup>
 import type Node from 'element-plus/es/components/tree/src/model/node';
-import docCate from '/@/api/docCate';
+import docNodeCate from '/@/api/docNodeCate';
 import {userStore} from '/@/store/user';
 import {docsStore} from '/@/store/docs';
-import type {TResult, TResultOfOp} from 'store';
+import type {TResult, TResultOfOp,TZGTree} from 'store';
+import { ArrowRight } from '@element-plus/icons-vue';
 
-interface Tree {
-  id: number
-  label: string
-  level: number
-  is_mine: number
-  children?: Tree[]
-}
+
 
 const store = userStore();
 const token = computed(() => store.token);
 const docs_store = docsStore();
 
-const append = (node:Node,data: Tree) => {
+const route = useRoute();
+const map_id = route.params.id as string;
 
+function onAddCate(){
+  ElMessageBox.prompt('请输入类别名称', '增加', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    inputPattern:
+      /[\u4e00-\u9fa5_a-zA-Z0-9 ]+/,
+    inputErrorMessage: '不正确的名称',
+  })
+    .then(({ value }) => {
+      doAdd2(value);
+    });
+}
+
+const append = (node:Node,data: TZGTree) => {
   ElMessageBox.prompt('请输入类别名称', '增加', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
@@ -81,10 +103,10 @@ const append = (node:Node,data: Tree) => {
     });
 };
 
-async function doAdd(node:Node,data:Tree,cate_name:string){
+async function doAdd(node:Node,data:TZGTree,cate_name:string){
   if(cate_name){
     docs_store.isNeedRefreshCateOption = false;
-    const result:TResultOfOp = await docCate.add(cate_name, node.data.id, token.value);
+    const result:TResultOfOp = await docNodeCate.add(cate_name, node.data.id, token.value, parseInt(map_id));
     if (result.success) {
       ElMessage({
         message: '添加成功。',
@@ -107,7 +129,32 @@ async function doAdd(node:Node,data:Tree,cate_name:string){
   }
 }
 
-const edit = (node:Node,data: Tree) => {
+async function doAdd2(cate_name:string){
+  if(cate_name){
+    docs_store.isNeedRefreshCateOption = false;
+    const result:TResultOfOp = await docNodeCate.add(cate_name, 0, token.value, parseInt(map_id));
+    if (result.success) {
+      ElMessage({
+        message: '添加成功。',
+        type: 'success',
+      });
+
+      const newChild = { id: (result.data.id), level:(result.data.level),is_mine:1, label: cate_name, children: [] };
+
+      dataSource.value.push(newChild);
+
+      dataSource.value = [...dataSource.value];
+      docs_store.isNeedRefreshCateOption = true;
+    } else {
+      ElMessage({
+        message: '添加失败：' + result.message,
+        type: 'error',
+      });
+    }
+  }
+}
+
+const edit = (node:Node,data: TZGTree) => {
 
   ElMessageBox.prompt('请输入类别名称', '修改', {
     confirmButtonText: '确定',
@@ -128,10 +175,10 @@ const edit = (node:Node,data: Tree) => {
     });
 };
 
-async function doEdit(node:Node,data:Tree,cate_name:string){
+async function doEdit(node:Node,data:TZGTree,cate_name:string){
   if(cate_name){
     docs_store.isNeedRefreshCateOption = false;
-    const result:TResultOfOp = await docCate.edit( node.data.id, cate_name, token.value);
+    const result:TResultOfOp = await docNodeCate.edit( node.data.id, cate_name, token.value, parseInt(map_id));
     if (result.success) {
       ElMessage({
         message: '修改成功。',
@@ -143,7 +190,7 @@ async function doEdit(node:Node,data:Tree,cate_name:string){
         data.children = [];
       }
       const parent = node.parent;
-      const children: Tree[] = parent.data.children || parent.data;
+      const children: TZGTree[] = parent.data.children || parent.data;
       const index = children.findIndex((d) => d.id === data.id);
       //children.splice(index, 1);
       children[index] = newChild;
@@ -159,7 +206,7 @@ async function doEdit(node:Node,data:Tree,cate_name:string){
   }
 }
 
-const remove = (node: Node, data: Tree) => {
+const remove = (node: Node, data: TZGTree) => {
   ElMessageBox.confirm(
     '确定要删除类别',
     '警告',
@@ -181,12 +228,12 @@ const remove = (node: Node, data: Tree) => {
 
 };
 
-async function doRemove(node: Node, data: Tree){
+async function doRemove(node: Node, data: TZGTree){
   const parent = node.parent;
-  const children: Tree[] = parent.data.children || parent.data;
+  const children: TZGTree[] = parent.data.children || parent.data;
   const index = children.findIndex((d) => d.id === data.id);
   docs_store.isNeedRefreshCateOption = false;
-  const result:TResult = await docCate.del(data.id, token.value);
+  const result:TResult = await docNodeCate.del(data.id, token.value);
   if (result.success) {
     ElMessage({
       message: '删除成功。',
@@ -205,13 +252,13 @@ async function doRemove(node: Node, data: Tree){
 }
 
 async function refreshCate(){
-  const result = await docCate.tree2(0, token.value);
+  const result = await docNodeCate.tree2(0, token.value, parseInt(map_id));
   if(result.success){
     dataSource.value = result.data.items;
   }
 }
 
-const dataSource = ref<Tree[]>([]);
+const dataSource = ref<TZGTree[]>([]);
 onMounted(refreshCate);
 
 watch(() => docs_store.isNeedRefreshCate, (first, second) => {

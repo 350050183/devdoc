@@ -9,6 +9,7 @@
           height="1000px"
           max="1"
           @click-item="clickLeftMenuItem"
+          @click-nav="clickLeftMenuNav"
         />
       </Col>
 
@@ -34,14 +35,8 @@
                     class="zg-grid-item-icon"
                     @click="openUrl(item.url)"
                   >
-                    <van-icon
-                      v-if="item.icon.indexOf('icon')!==false"
-                      :name="item.icon"
-                      size="110px"
-                    />
                     <van-image
-                      v-else
-                      :src="item.icon"
+                      :src="logo_url(item.icon)"
                       style="width:110px;"
                     />
                   </div>
@@ -80,7 +75,7 @@
 <script lang="ts" setup>
 import {IndexBar, Cell, IndexAnchor, Grid, GridItem, TreeSelect, Col, Row} from 'vant';
 import {docsStore} from '/@/store/docs';
-import docFavoriteUrl from '/@/api/docFavoriteUrl';
+import docFavoriteNode from '/@/api/docFavoriteNode';
 import {userStore} from '/@/store/user';
 // import {storeToRefs} from 'pinia';
 
@@ -98,6 +93,8 @@ const activeIndex = ref(0);
 const leftMenu = computed(() => store.leftMenu);
 const middleMenu = computed(() => store.middleMenu);
 
+const logo_url = (url:string)=>import.meta.env.VITE_API_SERVER_URL + url;
+
 function openUrl(url: string) {
   window.bridge.openUrl(url);
 }
@@ -105,6 +102,10 @@ function openUrl(url: string) {
 function clickLeftMenuItem(e: { text: string, id: number }) {
   store.setLeftMenuValue(e.id);
   store.getMiddleList(e.id,user.token);
+}
+
+function clickLeftMenuNav(idx:number) {
+  store.getMiddleList(parseInt(store.leftMenu[idx].id),user.token);
 }
 
 
@@ -116,14 +117,14 @@ const token = computed(() => user.token);
 
 async function onAddFavorite(e:Event,id:number){
   store.isNeedRefreshFavUrl = false;
-  const result = await docFavoriteUrl.add(id, token.value);
+  const result = await docFavoriteNode.add(id, token.value);
   if (result.success) {
     ElMessage({
       message: '收藏成功。',
       type: 'success',
     });
     store.isNeedRefreshFavUrl = true;
-    (e.target as HTMLElement).parentElement.style.display = 'none';
+    (e.target as HTMLElement).parentElement.parentElement.style.display = 'none';
   } else {
     ElMessage({
       message: '收藏失败：' + result.message,

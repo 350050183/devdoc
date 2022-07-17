@@ -35,6 +35,7 @@
               v-model="ruleForm.password"
               type="password"
               autocomplete="off"
+              @keydown.enter="submitForm(ruleFormRef)"
             />
           </el-form-item>
 
@@ -78,7 +79,7 @@ const docs_store = docsStore();
 const router = useRouter();
 
 function onRegister() {
-  router.push('ZGRegister');
+  router.push('/ZGRegister');
 }
 
 const ruleForm = reactive({
@@ -133,7 +134,7 @@ const submitForm = (formEl: FormInstance | undefined) => {
         await store.setValue(result.data.user_info);
         docs_store.isNeedRefreshCate = true;
 
-        emit('ZgNavClick', 'ZGUrl');
+        await router.push('/ZGMiddle');
       }else{
         ElMessage({
           message: '登录失败：'+result.message,

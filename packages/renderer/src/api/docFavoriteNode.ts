@@ -1,7 +1,7 @@
 import axios from 'axios';
-const api_dofavoritecurl_myurl = import.meta.env.VITE_API_SERVER_URL + '/docFavoriteUrl/myurl';
-const api_dofavoritecurl_del = import.meta.env.VITE_API_SERVER_URL + '/docFavoriteUrl/del';
-const api_dofavoritecurl_add = import.meta.env.VITE_API_SERVER_URL + '/docFavoriteUrl/add';
+const api_dofavoritecurl_myurl = import.meta.env.VITE_API_SERVER_URL + '/docFavoriteNode/myurl';
+const api_dofavoritecurl_del = import.meta.env.VITE_API_SERVER_URL + '/docFavoriteNode/del';
+const api_dofavoritecurl_add = import.meta.env.VITE_API_SERVER_URL + '/docFavoriteNode/add';
 
 function myurl(token: string, page = 1, size = 200) {
   const config = {params: {token: token, page: page, size: size}};

@@ -1,13 +1,13 @@
 import axios from 'axios';
 
-// const api = 'http://devdocs.secret8.net/api/docCate/index?parent_id=0';
-// const api_left_menu = 'http://devdocs.secret8.net/api/docCate/tree';
-const api = import.meta.env.VITE_API_SERVER_URL + '/docCate/index';
-const api_left_menu = import.meta.env.VITE_API_SERVER_URL + '/docCate/tree';
-const api_cate_tree2 = import.meta.env.VITE_API_SERVER_URL + '/docCate/tree2';
-const api_cate_del = import.meta.env.VITE_API_SERVER_URL + '/docCate/del';
-const api_cate_add = import.meta.env.VITE_API_SERVER_URL + '/docCate/add';
-const api_cate_edit = import.meta.env.VITE_API_SERVER_URL + '/docCate/edit';
+// const api = 'http://devdocs.secret8.net/api/docMapCate/index?parent_id=0';
+// const api_left_menu = 'http://devdocs.secret8.net/api/docMapCate/tree';
+const api = import.meta.env.VITE_API_SERVER_URL + '/docMapCate/index';
+const api_left_menu = import.meta.env.VITE_API_SERVER_URL + '/docMapCate/tree';
+const api_cate_tree2 = import.meta.env.VITE_API_SERVER_URL + '/docMapCate/tree2';
+const api_cate_del = import.meta.env.VITE_API_SERVER_URL + '/docMapCate/del';
+const api_cate_add = import.meta.env.VITE_API_SERVER_URL + '/docMapCate/add';
+const api_cate_edit = import.meta.env.VITE_API_SERVER_URL + '/docMapCate/edit';
 
 function index(parent_id = 0, page = 1, size = 20) {
   const config = {params: {parent_id: parent_id, page: page, size: size}};
