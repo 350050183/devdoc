@@ -6,7 +6,7 @@
           首页
         </el-breadcrumb-item>
         <el-breadcrumb-item :to="{path:'/ZGMap'}">
-          收藏夹管理
+          图谱管理
         </el-breadcrumb-item>
         <el-breadcrumb-item>
           网址管理
@@ -112,7 +112,7 @@
         :rules="rules"
       >
         <el-form-item
-          label="标题"
+          label="标题 *"
           label-width="120px"
           prop="title"
         >
@@ -123,7 +123,7 @@
         </el-form-item>
 
         <el-form-item
-          label="URL"
+          label="URL *"
           label-width="120px"
           prop="url"
         >
@@ -134,7 +134,7 @@
         </el-form-item>
 
         <el-form-item
-          label="简短介绍"
+          label="简短介绍 *"
           label-width="120px"
           prop="description"
         >
@@ -145,18 +145,18 @@
         </el-form-item>
 
         <el-form-item
-          label="类别"
+          label="类别 *"
           label-width="120px"
           prop="cate_id"
         >
           <el-tree-select
-            v-model="ruleForm.cate_id"
+            v-model="ruleForm.cate_name"
             :data="cateListData"
             :filter-node-method="filterNodeMethod"
             filterable
             :props="defaultProps"
+            @change="onTreeSelect"
           />
-
           &nbsp;
           <el-button
             type="primary"
@@ -168,7 +168,7 @@
         </el-form-item>
 
         <el-form-item
-          label="索引字母"
+          label="索引字母 *"
           label-width="120px"
           prop="alpha"
         >
@@ -234,18 +234,13 @@ import type {UploadFile, UploadProps, UploadUserFile, UploadFiles} from 'element
 import type {TZGNode, TZGTree} from 'store';
 import docNodeCate from '/@/api/docNodeCate';
 import type {FormInstance} from 'element-plus';
-import { ArrowRight } from '@element-plus/icons-vue';
-import {findClassNames} from '@volar/vue-language-service/out/utils/cssClasses';
-//import docUser from '/@/api/docUser';
+import {ArrowRight} from '@element-plus/icons-vue';
 
-// const props = defineProps({
-//   isNeedRefresh: { type: Boolean, required: false },
-// });
-
-// if(props.isNeedRefresh){
-//   console.log('isNeedRefresh');
-//   refreshUrlList();
-// }
+const defaultProps = {
+  children: 'children',
+  label: 'label',
+  value: 'id',
+};
 
 const store = userStore();
 const docs_store = docsStore();
@@ -269,29 +264,66 @@ const fileList = ref<UploadUserFile[]>([
   //   url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100',
   // }
 ]);
-const logo_url = (url:string)=>import.meta.env.VITE_API_SERVER_URL + url;
+const logo_url = (url: string) => url && url.length>0 ? import.meta.env.VITE_API_SERVER_URL + url:'';
 
 const router = useRouter();
 const route = useRoute();
 
 const map_id = route.params.id as string;
 
-function findCateName(cate_id:string){
-  return findCateNameRecursive(cateOptions.value,cate_id);
+const token = computed(() => store.token);
+
+watch(() => store.token, (first, second) => {
+  console.log('token changed: first:' + first + '; second:' + second);
+  if (first && first !== second) {
+    refreshUrlList();
+  }
+});
+
+watch(() => docs_store.isNeedRefreshCateOption, (first, second) => {
+  console.log('cate_option changed: first:' + first + '; second:' + second);
+  if (first) {
+    refreshCateOptions();
+  }
+});
+
+const cateListData = ref(list2);
+
+async function refreshUrlList() {
+  const result = await docNode.myurl(token.value, parseInt((route.params.id) as string), 1, 200);
+  if (result.success) {
+    tableData.value = result.data.items;
+  } else {
+    ElMessage({
+      message: '错误：' + result.message,
+      type: 'error',
+    });
+    if (parseInt(result.code) === 5504) {
+      store.token = '';
+      store.id = 0;
+      await router.push('/ZGLogin');
+    }
+  }
 }
 
-function findCateNameRecursive(cate_list:TZGTree[],cate_id:string):string{
-  for(const idx in cate_list){
+(refreshUrlList)();
+
+function findCateName(cate_id: string) {
+  return findCateNameRecursive(cateOptions.value, cate_id);
+}
+
+function findCateNameRecursive(cate_list: TZGTree[], cate_id: string): string {
+  for (const idx in cate_list) {
     const item = cate_list[idx];
-    if(item.id === cate_id){
+    if (item.id === cate_id) {
       return item.label;
-    }else if( item.children && item.children.length>0){
-      console.log('recursive');
-      console.log(item.children);
-       const found = findCateNameRecursive(item.children,cate_id);
-       if(found!=''){
-         return found;
-       }
+    } else if (item.children && item.children.length > 0) {
+      // console.log('recursive');
+      // console.log(item.children);
+      const found = findCateNameRecursive(item.children, cate_id);
+      if (found != '') {
+        return found;
+      }
     }
   }
   return '';
@@ -304,8 +336,9 @@ const filterTableData = computed(() =>
       data.title.toLowerCase().includes(search.value.toLowerCase()),
   ),
 );
+
 const onNodeCate = () => {
-  router.push('/ZGNodeCate/'+map_id);
+  router.push('/ZGNodeCate/' + map_id);
 };
 
 function onAdd() {
@@ -324,6 +357,7 @@ const validateTitle = (rule: any, value: string, callback: any) => {
     }
   }
 };
+
 const validateDescription = (rule: any, value: string, callback: any) => {
   if (!value || value === '') {
     callback(new Error('请输入描述'));
@@ -335,6 +369,7 @@ const validateDescription = (rule: any, value: string, callback: any) => {
     }
   }
 };
+
 const validateCateId = (rule: any, value: string, callback: any) => {
   console.log(value);
   if (!value || value === '') {
@@ -347,6 +382,7 @@ const validateCateId = (rule: any, value: string, callback: any) => {
     }
   }
 };
+
 const validateAlpha = (rule: any, value: string, callback: any) => {
   if (!value || value === '') {
     callback(new Error('请输入索引字母'));
@@ -359,6 +395,7 @@ const validateAlpha = (rule: any, value: string, callback: any) => {
     }
   }
 };
+
 const validateUrl = (rule: any, value: string, callback: any) => {
   if (!value || value === '') {
     callback(new Error('请输入URL'));
@@ -370,30 +407,32 @@ const validateUrl = (rule: any, value: string, callback: any) => {
     }
   }
 };
-const validateLogo = (rule: any, value: string, callback: any) => {
-  if (!value || value === '') {
-    callback(new Error('请上传LOGO文件'));
-  } else {
-    if (value.length < 6) {
-      callback(new Error('LOGO文件路径不正确'));
-    } else {
-      callback();
-    }
-  }
-};
+
+// const validateLogo = (rule: any, value: string, callback: any) => {
+//   if (!value || value === '') {
+//     callback(new Error('请上传LOGO文件'));
+//   } else {
+//     if (value.length < 6) {
+//       callback(new Error('LOGO文件路径不正确'));
+//     } else {
+//       callback();
+//     }
+//   }
+// };
 
 const rules = reactive({
   title: [{validator: validateTitle, trigger: 'blur'}],
   url: [{validator: validateUrl, trigger: 'blur'}],
   description: [{validator: validateDescription, trigger: 'blur'}],
   cate_id: [{validator: validateCateId, trigger: 'blur'}],
-  logo: [{validator: validateLogo, trigger: 'blur'}],
+  // logo: [{validator: validateLogo, trigger: 'blur'}],
   alpha: [{validator: validateAlpha, trigger: 'blur'}],
 });
 
 let ruleForm = reactive({
   id: '',
   cate_id: '',
+  cate_name: '',
   title: '',
   url: '',
   icon_class: '',
@@ -404,7 +443,6 @@ let ruleForm = reactive({
   description: '',
   map_id: map_id,
 });
-
 
 const onSave = (formEl: FormInstance | undefined) => {
   if (!formEl) return;
@@ -433,6 +471,7 @@ const onSave = (formEl: FormInstance | undefined) => {
 const onEdit = (index: number, row: TZGNode) => {
   ruleForm.id = row.id;
   ruleForm.cate_id = row.cate_id;
+  ruleForm.cate_name = row.cate_name;
   ruleForm.title = row.title;
   ruleForm.url = row.url;
   ruleForm.alpha = row.alpha;
@@ -458,45 +497,8 @@ const onDelete = async (index: number, row: TZGNode) => {
   }
 };
 
-const token = computed(() => store.token);
-
-watch(() => store.token, (first, second) => {
-  console.log('token changed: first:'+first+'; second:'+second);
-  if(first && first!==second){
-    refreshUrlList();
-  }
-});
-
-
-watch(() => docs_store.isNeedRefreshCateOption, (first, second) => {
-  console.log('cate_option changed: first:'+first+'; second:'+second);
-  if(first){
-    refreshCateOptions();
-  }
-});
-
-
-async function refreshUrlList() {
-  const result = await docNode.myurl(token.value, parseInt((route.params.id) as string), 1, 200);
-  if (result.success) {
-    tableData.value = result.data.items;
-  } else {
-    ElMessage({
-      message: '错误：' + result.message,
-      type: 'error',
-    });
-    if(parseInt(result.code)===5504){
-      store.token = '';
-      store.id = 0;
-      await router.push('/ZGLogin');
-    }
-  }
-}
-
-(refreshUrlList)();
-
-async function refreshCateOptions(){
-  const foo = await docNodeCate.tree2(0, store.token, parseInt(map_id),1,99999);
+async function refreshCateOptions() {
+  const foo = await docNodeCate.tree2(0, store.token, parseInt(map_id), 1, 99999);
   cateOptions.value = foo.data.items;
   cateListData.value = foo.data.items;
 }
@@ -543,18 +545,15 @@ const handleSuccess: UploadProps['onSuccess'] = (result: any, ufile: UploadFile,
 
 };
 
-const cateListData = ref(list2);
-
 // const filterMethod = (value:string) => {
 //   cateListData.value = [...cateOptions.value].filter((item) => item.label.includes(value));
 // };
-const filterNodeMethod = (value:string, data:TZGTree) => data.label.includes(value);
+const filterNodeMethod = (value: string, data: TZGTree) => data.label.includes(value);
 
-const defaultProps = {
-  children: 'children',
-  label: 'label',
-  value: 'id',
-};
+function onTreeSelect(val:any){
+  console.log(val);
+  ruleForm.cate_id = val;
+}
 </script>
 <style scoped>
 .container {
@@ -564,7 +563,8 @@ const defaultProps = {
 .logo {
   height: 30px;
 }
-.zg-breadcrumb{
-  padding:10px 0 30px 0;
+
+.zg-breadcrumb {
+  padding: 10px 0 30px 0;
 }
 </style>

@@ -63,7 +63,7 @@ export async function restoreOrCreateWindow() {
 
 
   window.setRepresentedFilename(os.homedir());
-  window.setDocumentEdited(false);
+  window.setDocumentEdited(true);
 
   window.maximize();
   window.focus();

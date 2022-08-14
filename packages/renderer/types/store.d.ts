@@ -15,9 +15,9 @@ declare module 'store' {
     leftMenu: TLeftMenu[],
     left_menu_id: number,
     middleMenu: TMiddleMenu[],
-    isNeedRefreshFavUrl: boolean,
-    isNeedRefreshCate: boolean,
-    isNeedRefreshCateOption: boolean,
+    isNeedRefreshFavUrl: boolean,//是否要刷新收藏地址
+    isNeedRefreshCate: boolean,//是否需要刷新顶部菜单
+    isNeedRefreshCateOption: boolean,//是否需要刷新图谱子类别
     map_id: number
   }
 
@@ -35,6 +35,7 @@ declare module 'store' {
   interface TZGNode {
     id:string,
     cate_id: string;
+    cate_name: string;
     title: string;
     url: string;
     icon_class: string;

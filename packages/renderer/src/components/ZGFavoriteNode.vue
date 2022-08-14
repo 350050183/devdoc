@@ -13,7 +13,7 @@
       style="width: 100%"
     >
       <el-table-column
-        label="收藏夹"
+        label="图谱"
         prop="map_name"
         width="160"
       >

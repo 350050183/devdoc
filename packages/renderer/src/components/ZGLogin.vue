@@ -75,7 +75,6 @@ import {docsStore} from '/@/store/docs';
 const store = userStore();
 const docs_store = docsStore();
 
-
 const router = useRouter();
 
 function onRegister() {

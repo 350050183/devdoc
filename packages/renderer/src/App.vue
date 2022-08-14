@@ -22,7 +22,7 @@ const siteTitle = computed(() => import.meta.env.VITE_SITE_TITLE);
         >
       </Col>
       <Col
-        span="1"
+        span="2"
         class="zg-center"
       >
         <div>
@@ -35,7 +35,7 @@ const siteTitle = computed(() => import.meta.env.VITE_SITE_TITLE);
         </div>
       </Col>
       <Col
-        span="21"
+        span="20"
         class="zg-nav-top"
       >
         <div>
@@ -133,12 +133,12 @@ body,a {
 
 .zg-main-site-title{
   /*display: flex;*/
-  font-size:15px;
+  font-size:16px;
 }
 
 .zg-my-site-title{
   /*display: flex;*/
-  font-size:11px;
+  font-size:14px;
   color:#999;
 }
 </style>

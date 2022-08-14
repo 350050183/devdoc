@@ -5,7 +5,7 @@
         <el-breadcrumb-item :to="{ path: '/' }">
           首页
         </el-breadcrumb-item>
-        <el-breadcrumb-item>收藏夹管理</el-breadcrumb-item>
+        <el-breadcrumb-item>图谱管理</el-breadcrumb-item>
       </el-breadcrumb>
     </div>
     <el-button
@@ -20,7 +20,7 @@
       style="width: 100%"
     >
       <el-table-column
-        label="收藏夹分类"
+        label="图谱分类"
         prop="cate_id"
         width="160"
       >
@@ -29,11 +29,11 @@
         </template>
       </el-table-column>
       <el-table-column
-        label="收藏夹名称"
+        label="图谱名称"
         prop="title"
       />
       <el-table-column
-        label="收藏夹图标"
+        label="图谱图标"
         prop="logo"
         width="100"
       >
@@ -209,18 +209,8 @@ import type {UploadFile, UploadProps, UploadUserFile, UploadFiles} from 'element
 import type {TZGNodeCate, TZGNode} from 'store';
 import docMapCate from '/@/api/docMapCate';
 import type {FormInstance} from 'element-plus';
-import { ArrowRight } from '@element-plus/icons-vue';
-import docMapDefault from '/@/api/docMapDefault';
-//import docUser from '/@/api/docUser';
-
-// const props = defineProps({
-//   isNeedRefresh: { type: Boolean, required: false },
-// });
-
-// if(props.isNeedRefresh){
-//   console.log('isNeedRefresh');
-//   refreshMap();
-// }
+import {ArrowRight} from '@element-plus/icons-vue';
+import docUser from '/@/api/docUser';
 
 const store = userStore();
 const docs_store = docsStore();
@@ -245,10 +235,42 @@ const fileList = ref<UploadUserFile[]>([
   // }
 ]);
 
-const logo_url = (url:string)=>import.meta.env.VITE_API_SERVER_URL + url;
+const logo_url = (url: string) => import.meta.env.VITE_API_SERVER_URL + url;
 
 const cate_name = (cate_id: string) => cateOptions.value.filter((row) => row.id === cate_id)?.[0]?.title;
 
+const router = useRouter();
+
+let ruleForm = reactive({
+  id: '',
+  cate_id: '',
+  title: '',
+  is_new: '',
+  logo: '',
+  logo_url: '',
+  description: '',
+});
+
+const token = computed(() => store.token);
+
+watch(() => store.token, (first, second) => {
+  // console.log('token changed: first:' + first + '; second:' + second);
+  if (first && first !== second) {
+    refreshMap();
+  }
+});
+
+watch(() => docs_store.isNeedRefreshCateOption, (first, second) => {
+  console.log('cate_option changed: first:' + first + '; second:' + second);
+  if (first) {
+    refreshCateOptions();
+  }
+});
+
+
+/**
+ * 搜索表格内容
+ */
 const filterTableData = computed(() =>
   tableData.value.filter(
     (data) =>
@@ -257,10 +279,45 @@ const filterTableData = computed(() =>
   ),
 );
 
-function onAdd() {
-  dialogFormVisible.value = true;
-  ruleForm.id = '';
+/**
+ * 刷新列表
+ */
+async function refreshMap() {
+  const result = await docMap.myurl(token.value, 1, 200);
+  if (result.success) {
+    console.log(store.default_map_id);
+    tableData.value = result.data.items;
+  } else {
+    if (parseInt(result.code) === 5504) {
+      store.token = '';
+      store.id = 0;
+      await router.push('/ZGLogin');
+    } else {
+      ElMessage({
+        message: '错误：' + result.message,
+        type: 'error',
+      });
+    }
+  }
 }
+
+/**
+ * 加载后自动刷新列表
+ */
+// (refreshMap)();
+onMounted(refreshMap);
+
+/**
+ * 获取图谱类别列表
+ */
+async function refreshCateOptions() {
+  cateOptions.value = await docMapCate.listByLevel(1, 1, 99999);
+}
+
+/**
+ * 挂载后自动获取图谱类别
+ */
+onMounted(refreshCateOptions);
 
 const validateTitle = (rule: any, value: string, callback: any) => {
   if (!value || value === '') {
@@ -273,6 +330,7 @@ const validateTitle = (rule: any, value: string, callback: any) => {
     }
   }
 };
+
 const validateDescription = (rule: any, value: string, callback: any) => {
   if (!value || value === '') {
     callback(new Error('请输入描述'));
@@ -284,6 +342,7 @@ const validateDescription = (rule: any, value: string, callback: any) => {
     }
   }
 };
+
 const validateCateId = (rule: any, value: string, callback: any) => {
   if (!value || value === '') {
     callback(new Error('请选择类别'));
@@ -295,6 +354,7 @@ const validateCateId = (rule: any, value: string, callback: any) => {
     }
   }
 };
+
 const validateLogo = (rule: any, value: string, callback: any) => {
   if (!value || value === '') {
     callback(new Error('请上传LOGO文件'));
@@ -314,15 +374,10 @@ const rules = reactive({
   logo: [{validator: validateLogo, trigger: 'blur'}],
 });
 
-let ruleForm = reactive({
-  id: '',
-  cate_id: '',
-  title: '',
-  is_new: '',
-  logo: '',
-  logo_url: '',
-  description: '',
-});
+function onAdd() {
+  dialogFormVisible.value = true;
+  ruleForm.id = '';
+}
 
 const onSave = (formEl: FormInstance | undefined) => {
   if (!formEl) return;
@@ -373,23 +428,27 @@ const onDelete = async (index: number, row: TZGNode) => {
   }
 };
 
-const router = useRouter();
-
 const onNode = (index: number, row: TZGNode) => {
-  router.push('/ZGNode/'+row.id);
+  router.push('/ZGNode/' + row.id);
 };
 
+/**
+ * 设置默认显示图谱
+ * @param index
+ * @param row
+ */
 const onSetDefaultMap = async (index: number, row: TZGNode) => {
   docs_store.isNeedRefreshCate = false;
   store.default_map_id = parseInt(row.id);
   store.default_map_name = row.title;
-  const result = await docMapDefault.add(parseInt(row.id), token.value);
+  const result = await docUser.setDefaultMapId(parseInt(row.id), token.value);
   if (result.success) {
     ElMessage({
       message: '设置成功。',
       type: 'success',
     });
-    await refreshMap();
+    // await refreshMap();
+    //刷新顶部菜单
     docs_store.isNeedRefreshCate = true;
   } else {
     ElMessage({
@@ -398,49 +457,6 @@ const onSetDefaultMap = async (index: number, row: TZGNode) => {
     });
   }
 };
-
-const token = computed(() => store.token);
-
-watch(() => store.token, (first, second) => {
-  console.log('token changed: first:'+first+'; second:'+second);
-  if(first && first!==second){
-    refreshMap();
-  }
-});
-
-
-watch(() => docs_store.isNeedRefreshCateOption, (first, second) => {
-  console.log('cate_option changed: first:'+first+'; second:'+second);
-  if(first){
-    refreshCateOptions();
-  }
-});
-
-async function refreshMap() {
-  const result = await docMap.myurl(token.value, 1, 200);
-  if (result.success) {
-    tableData.value = result.data.items;
-  } else {
-    if(parseInt(result.code)===5504){
-      store.token = '';
-      store.id = 0;
-      await router.push('/ZGLogin');
-    }else{
-      ElMessage({
-        message: '错误：' + result.message,
-        type: 'error',
-      });
-    }
-  }
-}
-
-(refreshMap)();
-
-async function refreshCateOptions(){
-  cateOptions.value = await docMapCate.listByLevel(1,1,99999);
-}
-
-onMounted(refreshCateOptions);
 
 const handleRemove: UploadProps['onRemove'] = (file, uploadFiles) => {
   // console.log(file, uploadFiles);
@@ -451,7 +467,6 @@ const handlePreview: UploadProps['onPreview'] = (uploadFile) => {
 };
 
 const handleExceed: UploadProps['onExceed'] = (files, uploadFiles) => {
-  // console.log('handleExceed call');
   ElMessage.warning(
     `选择的文件数量${files.length}，超出同时上传文件数量  ${
       files.length + uploadFiles.length
@@ -482,12 +497,14 @@ const handleSuccess: UploadProps['onSuccess'] = (result: any, ufile: UploadFile,
 
 };
 </script>
+
 <style scoped>
 .container {
   padding: 20px;
 }
-.zg-breadcrumb{
-  padding:10px 0 30px 0;
+
+.zg-breadcrumb {
+  padding: 10px 0 30px 0;
 }
 
 .logo {

@@ -8,6 +8,8 @@ if (process.env.VITE_APP_VERSION === undefined) {
  * @see https://www.electron.build/configuration/configuration
  */
 const config = {
+  productName: '万维图谱',
+  copyright: 'Copyright © 2022 ${author}',
   directories: {
     output: 'dist',
     buildResources: 'buildResources',

@@ -92,9 +92,6 @@ const filterTableData = computed(() =>
   ),
 );
 
-
-// const token = computed(() => store.token);
-
 watch(() => store.token, (first, second) => {
   console.log('token changed: first:'+first+'; second:'+second);
   if(first && first!==second){

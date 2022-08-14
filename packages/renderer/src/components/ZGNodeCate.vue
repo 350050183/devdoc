@@ -6,7 +6,7 @@
           首页
         </el-breadcrumb-item>
         <el-breadcrumb-item :to="{path:'/ZGMap'}">
-          收藏夹管理
+          图谱管理
         </el-breadcrumb-item>
         <el-breadcrumb-item :to="{path:'/ZGNode/'+map_id}">
           网址管理

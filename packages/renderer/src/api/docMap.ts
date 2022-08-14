@@ -17,6 +17,7 @@ function myurl(token: string, page = 1, size = 200) {
   const config = {params: {token: token, page: page, size: size}};
   return axios.get(api_docNode_my, config).then((res) => res.data);
 }
+
 function search(page = 1, size = 200) {
   const config = {params: {page: page, size: size}};
   return axios.get(api_docNode_index, config).then((res) => res.data);

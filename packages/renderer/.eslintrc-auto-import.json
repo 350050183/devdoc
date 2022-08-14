@@ -28,6 +28,7 @@
     "ElTable": true,
     "ElTableColumn": true,
     "ElTree": true,
+    "ElTreeSelect": true,
     "ElUpload": true,
     "getCurrentInstance": true,
     "getCurrentScope": true,

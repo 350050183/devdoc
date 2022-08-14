@@ -1,4 +1,5 @@
-import {app, BrowserWindow, ipcMain, screen} from 'electron';
+import type { MenuItem} from 'electron';
+import {app, BrowserWindow, ipcMain, screen, Menu} from 'electron';
 // import './security-restrictions';
 import {restoreOrCreateWindow} from '/@/mainWindow';
 import IpcMainEvent = Electron.IpcMainEvent;
@@ -10,7 +11,6 @@ ipcMain.on('open-url-event', function (event: IpcMainEvent, ...args: string[]) {
 
 
 async function openView(url: string) {
-
   const primaryDisplay = screen.getPrimaryDisplay();
   const {width, height} = primaryDisplay.workAreaSize;
   const window = new BrowserWindow({
@@ -45,6 +45,60 @@ async function openView(url: string) {
   // });
 }
 
+const isMac = process.platform === 'darwin';
+
+const template:any = [
+  // { role: 'appMenu' }
+  ...(isMac ? [{
+    label: app.name,
+    submenu: [
+      { role: 'about', label:'关于' },
+      { type: 'separator' },
+      { role: 'quit', label: '退出' },
+    ],
+  }] : []),
+  // { role: 'fileMenu' }
+  {
+    label: '文件',
+    submenu: [
+      isMac ? { role: 'close', label: '退出' } : { role: 'quit', label: '退出' },
+    ],
+  },
+  // { role: 'viewMenu' }
+  {
+    label: '查看',
+    submenu: [
+      { role: 'reload', label: '刷新' },
+      { role: 'forceReload', label: '强制刷新' },
+    ],
+  },
+  // { role: 'windowMenu' }
+  {
+    label: '窗口',
+    submenu: [
+      { role: 'minimize',label: '最小化' },
+      { role: 'zoom', label: '缩放' },
+    ],
+  },
+  {
+    role: 'help',
+    label: '帮助',
+    submenu: [
+      { role: 'about', label:'关于' },
+      {
+        label: '作者网站',
+        click: async () => {
+          const { shell } = require('electron');
+          await shell.openExternal('https://www.wukun.info');
+        },
+      },
+    ],
+  },
+];
+
+const menu = Menu.buildFromTemplate(template);
+Menu.setApplicationMenu(menu);
+
 /**
  * Prevent multiple instances
  */
@@ -53,6 +107,7 @@ if (!isSingleInstance) {
   app.quit();
   process.exit(0);
 }
+
 app.on('second-instance', restoreOrCreateWindow);
 
 

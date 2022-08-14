@@ -1,5 +1,9 @@
 {
-  "name": "devdocs",
+  "name": "devdoc",
+  "version": "1.0.1",
+  "author": "350050183@qq.com",
+  "description": "万维图谱:这是一款以网址为维度汇聚知识体系图谱的软件。",
+  "homepage": "https://www.wukun.info",
   "private": true,
   "engines": {
     "node": ">=v16.13",

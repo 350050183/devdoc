@@ -1,7 +1,6 @@
 import {defineStore} from 'pinia';
 import type {User} from 'store';
 
-
 export const userStore = defineStore('user', {
   state: () => {
     return {
@@ -24,6 +23,12 @@ export const userStore = defineStore('user', {
       this.mobile = mobile;
       this.token = token;
       this.default_map_id = default_map_id;
+    },
+    async setDefaultMapId(map_id: number) {
+      this.default_map_id = map_id;
+    },
+    async setToken(token: string) {
+      this.token = token;
     },
   },
 

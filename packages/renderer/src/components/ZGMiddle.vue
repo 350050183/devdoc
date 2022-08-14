@@ -93,7 +93,7 @@ const activeIndex = ref(0);
 const leftMenu = computed(() => store.leftMenu);
 const middleMenu = computed(() => store.middleMenu);
 
-const logo_url = (url:string)=>import.meta.env.VITE_API_SERVER_URL + url;
+const logo_url = (url:string)=> url && url.length>0 ? import.meta.env.VITE_API_SERVER_URL + url:'';
 
 function openUrl(url: string) {
   window.bridge.openUrl(url);

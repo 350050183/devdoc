@@ -54,7 +54,7 @@
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item @click="onMap">
-                    收藏夹管理
+                    图谱管理
                   </el-dropdown-item>
                   <el-dropdown-item @click="onFavoriteNode">
                     我喜欢的
